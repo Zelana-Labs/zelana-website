@@ -107,7 +107,7 @@ export function BatchTransactionCreator({
       }
 
       // Create all three transactions
-      const transactions: string[] = [];
+      const transactions: Transaction[] = [];
       const { blockhash } = await connection.getLatestBlockhash();
 
       for (let i = 0; i < 3; i++) {
@@ -126,10 +126,10 @@ export function BatchTransactionCreator({
         transaction.add(transferInstruction);
 
         const signedTransaction = await window.solana.signTransaction(transaction);
-        const serializedTransaction = signedTransaction.serialize();
-        const base64Transaction = serializedTransaction.toString('base64');
+        // const serializedTransaction = signedTransaction.serialize();
+        // const base64Transaction = serializedTransaction.toString('base64');
         
-        transactions.push(base64Transaction);
+        transactions.push(signedTransaction);
       }
 
       // Submit all transactions as a batch

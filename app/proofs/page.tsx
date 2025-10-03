@@ -62,42 +62,49 @@ function readVecU8x32(buf: Buffer, off: number): [string[], number] {
 
 /** Parse VerifiedGroth16Proof from raw account data */
 function parseVerifiedGroth16Proof(data: Buffer): Omit<VerifiedGroth16Proof, "pubkey" | "lamports"> {
-    let off = 0;
+  let off = 0;
 
-    const disc = data.subarray(off, off + 8); off += 8;
-    if (!eq8(disc, DISC_VERIFIED_GROTH16_PROOF)) {
-        throw new Error("Not a VerifiedGroth16Proof account");
-    }
+  const disc = data.subarray(off, off + 8);
+  off += 8;
+  if (!eq8(disc, DISC_VERIFIED_GROTH16_PROOF)) {
+    throw new Error("Not a VerifiedGroth16Proof account");
+  }
 
-    const authority = new PublicKey(data.subarray(off, off + 32)); off += 32;
+  const authority = new PublicKey(data.subarray(off, off + 32));
+  off += 32;
 
-    let pi_a, pi_b, pi_c: Buffer;
-    [pi_a, off] = readU8Arr(data, off, 64);
-    [pi_b, off] = readU8Arr(data, off, 128);
-    [pi_c, off] = readU8Arr(data, off, 64);
-    const proof: Groth16Proof = {
-        pi_a: Buffer.from(pi_a).toString("hex"),
-        pi_b: Buffer.from(pi_b).toString("hex"),
-        pi_c: Buffer.from(pi_c).toString("hex"),
-    };
+  const [pi_a, o1] = readU8Arr(data, off, 64);
+  const [pi_b, o2] = readU8Arr(data, o1, 128);
+  const [pi_c, o3] = readU8Arr(data, o2, 64);
+  off = o3;
 
-    let inputsHex: string[];[inputsHex, off] = readVecU8x32(data, off);
-    const public_inputs: PublicInputs = { inputs: inputsHex };
+  const proof: Groth16Proof = {
+    pi_a: Buffer.from(pi_a).toString("hex"),
+    pi_b: Buffer.from(pi_b).toString("hex"),
+    pi_c: Buffer.from(pi_c).toString("hex"),
+  };
 
-    let vkHash: Buffer;[vkHash, off] = readU8Arr(data, off, 32);
-    const verifying_key_hash = Buffer.from(vkHash).toString("hex");
+  const [inputsHex, o4] = readVecU8x32(data, off);
+  off = o4;
+  const public_inputs: PublicInputs = { inputs: inputsHex };
 
-    let verified_at: number;[verified_at, off] = readI64LE(data, off);
-    const bump = data[off];
+  const [vkHash, o5] = readU8Arr(data, off, 32);
+  off = o5;
+  const verifying_key_hash = Buffer.from(vkHash).toString("hex");
 
-    return {
-        authority: authority.toBase58(),
-        proof,
-        public_inputs,
-        verifying_key_hash,
-        verified_at,
-        bump,
-    };
+  const [verified_at, o6] = readI64LE(data, off);
+  off = o6;
+
+  const bump = data[off];
+
+  return {
+    authority: authority.toBase58(),
+    proof,
+    public_inputs,
+    verifying_key_hash,
+    verified_at,
+    bump,
+  };
 }
 
 /** Utils */
@@ -308,16 +315,16 @@ export default function ProofsPage() {
                             </div>
 
 
-                <details className="group">
-  <summary className="cursor-pointer text-blue-700 font-semibold">
-    Proof (Groth16)
-  </summary>
-  <div className="mt-2 grid gap-3 text-xs sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-    <CodeBlock label="pi_a" value={p.proof.pi_a} />
-    <CodeBlock label="pi_b" value={p.proof.pi_b} />
-    <CodeBlock label="pi_c" value={p.proof.pi_c} />
-  </div>
-</details>
+                            <details className="group">
+                                <summary className="cursor-pointer text-blue-700 font-semibold">
+                                    Proof (Groth16)
+                                </summary>
+                                <div className="mt-2 grid gap-3 text-xs sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                                    <CodeBlock label="pi_a" value={p.proof.pi_a} />
+                                    <CodeBlock label="pi_b" value={p.proof.pi_b} />
+                                    <CodeBlock label="pi_c" value={p.proof.pi_c} />
+                                </div>
+                            </details>
 
 
 
@@ -376,7 +383,7 @@ export default function ProofsPage() {
                 <div className="bg-white border rounded-xl shadow-sm p-5 sticky top-6">
                     <h2 className="text-xl font-bold mb-3">Legend & What you can do</h2>
                     <ul className="list-disc list-inside text-sm text-gray-700 space-y-2">
-                        <li><strong>PDA</strong>: Program Derived Account storing one verified proof. Seeds <code>["groth16_proof", authority, proof_id]</code>.</li>
+                        <li><strong>PDA</strong>: Program Derived Account storing one verified proof.  Seeds <code>{'["groth16_proof", authority, proof_id]'}</code>.</li>
                         <li><strong>Authority</strong>: Wallet that submitted the proof. Filter/group by this to track provenance.</li>
                         <li><strong>Verifying Key Hash</strong>: 32-byte hash of the VK used during verification; cross-check off-chain VKs.</li>
                         <li><strong>Verified At</strong>: UNIX timestamp when the proof was accepted on-chain.</li>
@@ -431,18 +438,18 @@ function CopyBtn({ onClick }: { onClick: () => void }) {
 }
 
 function CodeBlock({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="w-full">
-      <div className="text-xs text-gray-500 mb-1">{label}</div>
-      <pre className="p-2 bg-gray-50 border rounded font-mono text-[11px] break-all whitespace-pre-wrap">
-        {value}
-      </pre>
-      <button
-        className="mt-1 text-xs text-blue-700 hover:underline"
-        onClick={() => navigator.clipboard.writeText(value)}
-      >
-        copy
-      </button>
-    </div>
-  );
+    return (
+        <div className="w-full">
+            <div className="text-xs text-gray-500 mb-1">{label}</div>
+            <pre className="p-2 bg-gray-50 border rounded font-mono text-[11px] break-all whitespace-pre-wrap">
+                {value}
+            </pre>
+            <button
+                className="mt-1 text-xs text-blue-700 hover:underline"
+                onClick={() => navigator.clipboard.writeText(value)}
+            >
+                copy
+            </button>
+        </div>
+    );
 }

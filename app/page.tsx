@@ -38,7 +38,7 @@ export default function RollupClientPage() {
   };
 
   useEffect(() => {
-    const sol = (window as any)?.solana;
+    const sol = (window)?.solana;
     if (sol?.isConnected && sol.publicKey) {
       setWalletConnected(true);
       setWalletAddress(sol.publicKey.toString());
@@ -81,7 +81,7 @@ export default function RollupClientPage() {
       const result = await getTransaction(transactionHash.trim());
       setSearchResult(result);
     } catch (error) {
-      setSearchResult({ error: error instanceof Error ? error.message : "Unknown error" } as any);
+      setSearchResult({ error: error instanceof Error ? error.message : "Unknown error" });
     } finally {
       setIsSearchLoading(false);
     }
