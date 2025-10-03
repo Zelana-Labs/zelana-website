@@ -1,399 +1,294 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { TransactionCreator } from "@/components/transaction-creator";
-import { BatchTransactionCreator } from "@/components/batch-transaction-creator";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { motion } from "framer-motion";
 import {
-  healthCheck,
-  getTransaction,
-  getTransactionsPage,
-  type TransactionWithHash,
-  type RollupTransaction,
-} from "@/lib/api";
+  ShieldCheck,
+  GitBranch,
+  ClipboardCopy,
+  CopyCheck,
+  Bolt,
+  LayoutGrid,
+  SlidersHorizontal,
+  Github,
+  ExternalLink,
+} from "lucide-react";
+import Navbar from "@/components/ui/Navbar";
 
-interface HealthStatus {
-  status: string;
-  timestamp: number;
+/**
+ * Drop this file in `src/app/(marketing)/page.tsx` or similar.
+ * You can split Navbar, Card, Feature, etc. into separate files later.
+ * Tailwind + framer-motion + lucide-react are used. No shadcn imports needed.
+ */
+
+export default function LandingPage() {
+  return (
+    <div className="min-h-screen bg-gray-50 text-gray-900">
+      <GradientBG />
+
+      {/* Hero */}
+      <section className="relative overflow-hidden">
+        {/* soft radial glow behind content */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)]"
+        >
+          <div className="absolute left-1/2 top-[-20%] h-[70vh] w-[90vw] -translate-x-1/2 rounded-full bg-gradient-to-r from-indigo-200 via-purple-200 to-cyan-200 blur-3xl opacity-60" />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-6 pt-20 pb-12">
+          <div className="flex flex-col items-center text-center gap-7">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="inline-flex items-center gap-3"
+            >
+              <div className="relative">
+                <Image
+                  src="/logo.png"
+                  alt="Zelana logo"
+                  width={84}
+                  height={84}
+                  className="rounded-xl shadow-sm ring-1 ring-black/5"
+                />
+                <span className="absolute -right-2 -bottom-2 inline-flex items-center gap-1 rounded-full bg-black text-white text-[10px] px-2 py-1">
+                  <Bolt className="h-3 w-3" />
+                  devnet
+                </span>
+              </div>
+              <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">
+                Zelana
+              </h1>
+            </motion.div>
+
+            <motion.p
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.4 }}
+              className="max-w-2xl text-lg md:text-xl text-gray-600"
+            >
+              A lightweight dashboard to explore verified ZK proofs on Solana devnet —
+              built for builders who want clarity, speed, and simple integrations.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, duration: 0.4 }}
+              className="flex flex-wrap items-center justify-center gap-3"
+            >
+              <PrimaryButton href="/proofs">View Proofs</PrimaryButton>
+              <GhostButton href="https://github.com/Zelana-Labs" target="_blank">
+                <Github className="h-4 w-4 mr-1.5" /> GitHub
+              </GhostButton>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+              className="text-xs text-gray-500 flex items-center gap-1"
+            >
+              <span>Program ID:</span>
+              <CodePill value="Aa3rXCBoxPVZ537nqccEiVsLBoZ2G7gdfNjypM9wP8Yi" />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Value props */}
+      <section className="max-w-7xl mx-auto px-6 py-12">
+        <div className="grid md:grid-cols-3 gap-6">
+          <Card
+            icon={<ShieldCheck className="h-5 w-5" />}
+            title="Instant visibility"
+            body="Scan all program accounts of the Groth16 proof type and sort by most recent verification."
+          />
+          <Card
+            icon={<LayoutGrid className="h-5 w-5" />}
+            title="Structured decoding"
+            body="Account bytes are parsed into authority, public inputs, verifying key hash, timestamps, and more."
+          />
+          <Card
+            icon={<SlidersHorizontal className="h-5 w-5" />}
+            title="Builder friendly"
+            body="Copy addresses, export JSON/CSV, and plug data into downstream pipelines or dashboards."
+          />
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="max-w-7xl mx-auto px-6 pb-12">
+        <div className="bg-white/80 backdrop-blur border rounded-2xl shadow-sm p-6 md:p-8">
+          <div className="flex items-center gap-2 mb-4">
+            <GitBranch className="h-5 w-5 text-gray-700" />
+            <h2 className="text-2xl font-bold">How it works</h2>
+          </div>
+
+          <ol className="list-decimal list-inside space-y-2 text-gray-700">
+            <li>Connect to Solana devnet and fetch accounts owned by your verifier program.</li>
+            <li>
+              Filter by the
+              <code className="ml-1 font-mono text-sm bg-gray-50 px-1.5 py-0.5 rounded border">
+                VerifiedGroth16Proof
+              </code>
+              discriminator.
+            </li>
+            <li>
+              Decode Borsh data into readable fields: authority, proof elements, public inputs, verifying key hash, and timestamps.
+            </li>
+            <li>Explore, filter by authority or date, and export what you need.</li>
+          </ol>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <PrimaryButton href="/proofs">Open Proofs Dashboard</PrimaryButton>
+            <GhostButton href="https://docs.solana.com/" target="_blank">
+              Solana Docs <ExternalLink className="h-4 w-4 ml-1" />
+            </GhostButton>
+          </div>
+        </div>
+      </section>
+
+      {/* Feature grid */}
+      <section className="max-w-7xl mx-auto px-6 pb-12">
+        <div className="grid lg:grid-cols-2 gap-6">
+          <Feature
+            title="Groth16 Proofs"
+            points={[
+              "View pi_a, pi_b, pi_c as hex (wrapped neatly).",
+              "Public inputs rendered as compact blocks with copy buttons.",
+              "Legend explains each field and how to use it.",
+            ]}
+          />
+          <Feature
+            title="Clean UI"
+            points={[
+              "Responsive layout with accessible components.",
+              "No heavy dependencies — just Next.js and Tailwind.",
+              "Ready to extend with wallet connect or custom filters.",
+            ]}
+          />
+        </div>
+      </section>
+
+      {/* CTA band */}
+      <section className="max-w-7xl mx-auto px-6 pb-16">
+        <div className="rounded-2xl border bg-gradient-to-r from-black to-gray-800 text-white p-6 md:p-8 overflow-hidden relative">
+          <div aria-hidden className="absolute -right-8 -top-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
+          <h3 className="text-2xl font-bold">Ready to explore proofs?</h3>
+          <p className="text-gray-300 mt-1">Jump into the dashboard and filter by authority or time range.</p>
+          <div className="mt-4">
+            <a href="/proofs" className="inline-block px-5 py-3 rounded-lg bg-white text-black hover:opacity-90 transition">
+              Go to Proofs
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t bg-white/80 backdrop-blur">
+        <div className="max-w-7xl mx-auto px-6 py-8 text-sm text-gray-500 flex flex-col md:flex-row items-center justify-between gap-2">
+          <div>© {new Date().getFullYear()} Elzzen. All rights reserved.</div>
+          <div className="flex items-center gap-4">
+            <a href="https://github.com/Zelana-Labs" target="_blank" rel="noreferrer" className="hover:text-gray-700 inline-flex items-center gap-1">
+              <Github className="h-4 w-4" /> GitHub
+            </a>
+            <Link href="/proofs" className="hover:text-gray-700">
+              Proofs
+            </Link>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
 }
 
-export default function RollupClientPage() {
-  const [healthStatus, setHealthStatus] = useState<HealthStatus | null>(null);
-  const [isHealthLoading, setIsHealthLoading] = useState(false);
-  const [transactions, setTransactions] = useState<TransactionWithHash[]>([]);
-  const [isTransactionsLoading, setIsTransactionsLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [transactionHash, setTransactionHash] = useState("");
-  const [searchResult, setSearchResult] = useState<RollupTransaction | null>(null);
-  const [isSearchLoading, setIsSearchLoading] = useState(false);
+/* ----------------------- UI bits ----------------------- */
 
-  // wallet state
-  const [walletConnected, setWalletConnected] = useState(false);
-  const [walletAddress, setWalletAddress] = useState<string>("");
-  const [senderName, setSenderName] = useState("");
-
-  const handleWalletConnect = (connected: boolean, address: string, name: string) => {
-    setWalletConnected(connected);
-    setWalletAddress(address);
-    setSenderName(name);
-  };
-
-  useEffect(() => {
-    const sol = (window)?.solana;
-    if (sol?.isConnected && sol.publicKey) {
-      setWalletConnected(true);
-      setWalletAddress(sol.publicKey.toString());
-      setSenderName("Phantom User");
-    }
-  }, []);
-
-  const performHealthCheck = async () => {
-    setIsHealthLoading(true);
-    try {
-      const result = await healthCheck();
-      setHealthStatus({ status: JSON.stringify(result), timestamp: Date.now() });
-    } catch (error) {
-      setHealthStatus({
-        status: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
-        timestamp: Date.now(),
-      });
-    } finally {
-      setIsHealthLoading(false);
-    }
-  };
-
-  const loadTransactions = async (page = 1) => {
-    setIsTransactionsLoading(true);
-    try {
-      const result = await getTransactionsPage(page, 10);
-      setTransactions(result.transactions);
-      setCurrentPage(page);
-    } catch (e) {
-      console.error("Failed to load transactions:", e);
-    } finally {
-      setIsTransactionsLoading(false);
-    }
-  };
-
-  const searchTransaction = async () => {
-    if (!transactionHash.trim()) return;
-    setIsSearchLoading(true);
-    try {
-      const result = await getTransaction(transactionHash.trim());
-      setSearchResult(result);
-    } catch (error) {
-      setSearchResult({ error: error instanceof Error ? error.message : "Unknown error" });
-    } finally {
-      setIsSearchLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    performHealthCheck();
-    loadTransactions();
-  }, []);
-
-  // primitives
-  const Card = ({
-    children,
-    className = "",
-  }: {
-    children: React.ReactNode;
-    className?: string;
-  }) => (
-    <section className={`rounded-2xl border bg-white/80 dark:bg-slate-900/70 ring-1 ring-black/5 dark:ring-white/10 shadow-md ${className}`}>
-      {children}
-    </section>
-  );
-
-  const SectionTitle = ({ title, subtitle }: { title: string; subtitle?: string }) => (
-    <div className="mb-6">
-      <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
-      {subtitle && <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>}
-    </div>
-  );
-
-  const Button = ({
-    children,
-    onClick,
-    disabled,
-    variant = "solid",
-    size = "md",
-    className = "",
-    type = "button",
-  }: {
-    children: React.ReactNode;
-    onClick?: () => void;
-    disabled?: boolean;
-    variant?: "solid" | "outline" | "ghost";
-    size?: "sm" | "md" | "lg";
-    className?: string;
-    type?: "button" | "submit" | "reset";
-  }) => {
-    const sizeCls = size === "lg" ? "h-12 px-6" : size === "sm" ? "h-9 px-3 text-sm" : "h-10 px-4";
-    const base = "inline-flex items-center justify-center rounded-xl font-medium transition focus:outline-none focus:ring-4 ring-indigo-500/20";
-    const variants =
-      variant === "outline"
-        ? "border border-slate-300/70 dark:border-slate-700/70 bg-transparent hover:bg-slate-100/60 dark:hover:bg-slate-800/60"
-        : variant === "ghost"
-        ? "hover:bg-slate-100/60 dark:hover:bg-slate-800/60"
-        : "bg-indigo-600 text-white hover:bg-indigo-600/90";
-    return (
-      <button type={type} onClick={onClick} disabled={disabled} className={`${base} ${sizeCls} ${variants} disabled:opacity-60 ${className}`}>
-        {children}
-      </button>
-    );
-  };
-
-  const Input = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
-    <input
-      {...props}
-      className={`h-11 w-full rounded-xl border border-slate-300/70 dark:border-slate-700/70 bg-white/70 dark:bg-slate-900/60 px-3 text-sm outline-none focus:ring-4 ring-indigo-500/20 ${props.className ?? ""}`}
-    />
-  );
-
+function GradientBG() {
   return (
-    <div className="min-h-screen bg-[radial-gradient(60rem_60rem_at_90%_-10%,rgba(99,102,241,.2),transparent),radial-gradient(50rem_50rem_at_-10%_10%,rgba(16,185,129,.15),transparent)]">
-      {/* Sticky top actions */}
-      <div className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-slate-900/60 border-b border-black/5 dark:border-white/10">
-        <div className="mx-auto max-w-7xl px-4 py-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div>
-            <div className="text-xs uppercase tracking-wider text-slate-500">ZKSVM Rollup</div>
-            <div className="text-base font-semibold">Management Dashboard</div>
+    <div aria-hidden className="fixed inset-0 -z-20 bg-[radial-gradient(60%_60%_at_50%_0%,#e2e8f0_0%,transparent_60%)]" />
+  );
+}
+
+function PrimaryButton({ href, children, target }: { href: string; children: React.ReactNode; target?: string }) {
+  return (
+    <Link
+      href={href}
+      target={target}
+      className="px-5 py-3 rounded-xl bg-black text-white shadow-sm ring-1 ring-black/10 hover:opacity-95 transition inline-flex items-center"
+    >
+      {children}
+    </Link>
+  );
+}
+
+function GhostButton({ href, children, target }: { href: string; children: React.ReactNode; target?: string }) {
+  return (
+    <Link
+      href={href}
+      target={target}
+      className="px-5 py-3 rounded-xl border bg-white/70 hover:bg-white transition inline-flex items-center"
+    >
+      {children}
+    </Link>
+  );
+}
+
+function Card({ title, body, icon }: { title: string; body: string; icon?: React.ReactNode }) {
+  return (
+    <div className="bg-white border rounded-2xl shadow-sm p-6">
+      <div className="flex items-start gap-3">
+        {icon && (
+          <div className="mt-0.5 h-8 w-8 rounded-xl border flex items-center justify-center text-gray-700">
+            {icon}
           </div>
-          <div className="flex items-center gap-2">
-            <Button onClick={performHealthCheck} disabled={isHealthLoading} size="sm">
-              {isHealthLoading ? "Checking…" : "Health Check"}
-            </Button>
-            <Button onClick={() => loadTransactions(currentPage)} disabled={isTransactionsLoading} variant="outline" size="sm">
-              View Transactions
-            </Button>
-          </div>
+        )}
+        <div>
+          <h3 className="text-lg font-semibold tracking-tight">{title}</h3>
+          <p className="text-gray-600 mt-1 leading-relaxed">{body}</p>
         </div>
-      </div>
-
-      {/* Page container */}
-      <div className="mx-auto max-w-7xl px-4 py-10 space-y-10">
-        {/* Hero */}
-        <header className="text-center space-y-3">
-          <p className="text-sm text-slate-500">
-            Monitor, create, and analyze rollup transactions.{" "}
-            <span className="font-semibold text-indigo-600">Batch 3 tx to settle on L1 instantly.</span>
-          </p>
-        </header>
-
-        {/* Stats */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          <Card>
-            <div className="p-5 flex items-center justify-between">
-              <div>
-                <div className="text-xs font-medium text-slate-500">Network Status</div>
-                <div className="mt-2 flex items-center gap-2">
-                  <span
-                    className={`size-2 rounded-full ${
-                      healthStatus?.status.includes("Error") ? "bg-rose-500" : "bg-emerald-500"
-                    }`}
-                  />
-                  <span className="text-xl font-semibold">
-                    {healthStatus?.status.includes("Error") ? "Offline" : "Online"}
-                  </span>
-                </div>
-              </div>
-              <div className="rounded-xl bg-indigo-100 text-indigo-700 p-2 dark:bg-indigo-900/30 dark:text-indigo-300">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-            </div>
-          </Card>
-
-          <Card>
-            <div className="p-5 flex items-center justify-between">
-              <div>
-                <div className="text-xs font-medium text-slate-500">Total Transactions</div>
-                <div className="mt-2 text-xl font-semibold">{transactions.length}</div>
-              </div>
-              <div className="rounded-xl bg-indigo-100 text-indigo-700 p-2 dark:bg-indigo-900/30 dark:text-indigo-300">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586l5.707 5.707" />
-                </svg>
-              </div>
-            </div>
-          </Card>
-
-          <Card>
-            <div className="p-5 flex items-center justify-between">
-              <div>
-                <div className="text-xs font-medium text-slate-500">Current Page</div>
-                <div className="mt-2 text-xl font-semibold">{currentPage}</div>
-              </div>
-              <div className="rounded-xl bg-indigo-100 text-indigo-700 p-2 dark:bg-indigo-900/30 dark:text-indigo-300">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4V2h10v2m-12 2h14v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6z" />
-                </svg>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Create Transactions */}
-        <section className="space-y-8">
-          <SectionTitle
-            title="Create Transactions"
-            subtitle="Build single or batched transactions. Submitting 3 in batch will trigger immediate L1 settlement."
-          />
-
-          {/* Batch creator full width */}
-          <Card>
-            <div className="p-6">
-              <BatchTransactionCreator
-                onTransactionSubmitted={() => loadTransactions(currentPage)}
-                walletConnected={walletConnected}
-                walletAddress={walletAddress}
-                senderName={senderName}
-              />
-            </div>
-          </Card>
-
-          {/* Two-column: Health + Single creator */}
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-            <Card>
-              <div className="p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">System Health</h3>
-                  <Button onClick={performHealthCheck} disabled={isHealthLoading}>
-                    {isHealthLoading ? "Checking…" : "Run Health Check"}
-                  </Button>
-                </div>
-
-                {healthStatus && (
-                  <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white/60 dark:bg-slate-900/50 p-4">
-                    <code className="block text-xs font-mono break-all">{healthStatus.status}</code>
-                    <div className="mt-2 text-xs text-slate-500 flex items-center gap-2">
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      Last checked: {new Date(healthStatus.timestamp).toLocaleTimeString()}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </Card>
-
-            <Card>
-              <div className="p-6">
-                <TransactionCreator
-                  onTransactionSubmitted={() => loadTransactions(currentPage)}
-                  walletConnected={walletConnected}
-                  walletAddress={walletAddress}
-                  senderName={senderName}
-                  onWalletConnect={handleWalletConnect}
-                />
-              </div>
-            </Card>
-          </div>
-        </section>
-
-        {/* Search */}
-        <section>
-          <SectionTitle title="Transaction Search" subtitle="Find a transaction by its signature hash" />
-          <Card>
-            <div className="p-6 space-y-4">
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <Input
-                  placeholder="Enter transaction signature hash…"
-                  value={transactionHash}
-                  onChange={(e) => setTransactionHash(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && searchTransaction()}
-                  className="flex-1"
-                />
-                <Button onClick={searchTransaction} disabled={isSearchLoading || !transactionHash.trim()}>
-                  {isSearchLoading ? "Searching…" : "Search"}
-                </Button>
-              </div>
-
-              {searchResult && (
-                <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white/60 dark:bg-slate-900/50 p-4">
-                  <pre className="text-xs font-mono whitespace-pre-wrap break-all">
-                    {JSON.stringify(searchResult, null, 2)}
-                  </pre>
-                </div>
-              )}
-            </div>
-          </Card>
-        </section>
-
-        {/* List */}
-        <section>
-          <SectionTitle title="Recent Transactions" subtitle="Latest transactions processed by the rollup" />
-          <Card>
-            <div className="p-5 space-y-5">
-              <div className="flex items-center justify-between gap-3">
-                <Button onClick={() => loadTransactions(currentPage)} disabled={isTransactionsLoading} variant="outline">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  Refresh
-                </Button>
-
-                <div className="flex items-center gap-2">
-                  <Button
-                    onClick={() => loadTransactions(Math.max(1, currentPage - 1))}
-                    disabled={isTransactionsLoading || currentPage <= 1}
-                    variant="outline"
-                    size="sm"
-                  >
-                    ‹ Prev
-                  </Button>
-                  <div className="px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700 text-sm">Page {currentPage}</div>
-                  <Button
-                    onClick={() => loadTransactions(currentPage + 1)}
-                    disabled={isTransactionsLoading || transactions.length < 10}
-                    variant="outline"
-                    size="sm"
-                  >
-                    Next ›
-                  </Button>
-                </div>
-              </div>
-
-              {isTransactionsLoading ? (
-                <div className="py-12 flex items-center justify-center text-slate-500">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-current mr-3" />
-                  Loading transactions…
-                </div>
-              ) : transactions.length ? (
-                <ul className="space-y-4">
-                  {transactions.map((tx, i) => (
-                    <li
-                      key={`${tx.hash}-${i}`}
-                      className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white/60 dark:bg-slate-900/50 p-4"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="font-mono text-xs sm:text-sm font-medium truncate max-w-[70%] bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-2 py-1 rounded">
-                          {tx.hash}
-                        </div>
-                        <div className="text-xs text-slate-500">#{i + 1}</div>
-                      </div>
-                      <pre className="text-[11px] sm:text-xs font-mono whitespace-pre-wrap break-all text-slate-600 dark:text-slate-300">
-                        {JSON.stringify(tx.transaction, null, 2)}
-                      </pre>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <div className="py-12 text-center">
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-800 mb-4">
-                    <svg className="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586L18 8.414V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </div>
-                  <div className="text-sm text-slate-500">No transactions yet. Create one above, or refresh.</div>
-                </div>
-              )}
-            </div>
-          </Card>
-        </section>
       </div>
     </div>
+  );
+}
+
+function Feature({ title, points }: { title: string; points: string[] }) {
+  return (
+    <div className="bg-white border rounded-2xl shadow-sm p-6 md:p-8">
+      <h3 className="text-xl font-bold">{title}</h3>
+      <ul className="mt-3 space-y-2 text-gray-700">
+        {points.map((p) => (
+          <li key={p} className="flex gap-2 items-start">
+            <span className="mt-2 h-1.5 w-1.5 rounded-full bg-gray-400" />
+            <span>{p}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function CodePill({ value }: { value: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(value);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 1200);
+        } catch {}
+      }}
+      className="group inline-flex items-center gap-1.5 rounded-lg border bg-white/70 px-2.5 py-1 font-mono text-xs text-gray-700 hover:bg-white"
+      title={value}
+    >
+      <span className="truncate max-w-[220px] sm:max-w-[360px]">{value}</span>
+      {copied ? <CopyCheck className="h-3.5 w-3.5" /> : <ClipboardCopy className="h-3.5 w-3.5 opacity-70 group-hover:opacity-100" />}
+    </button>
   );
 }
