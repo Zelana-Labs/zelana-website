@@ -1,0 +1,499 @@
+{
+  "address": "6qPEb6x1oGhd2pf1UP3bgMWa7NspSNryzrA6ZCdsbFwT",
+  "metadata": {
+    "name": "onchain_verifier",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "ZK proof verifier smart contract",
+    "repository": "https://github.com/Zelana-Labs/zelana-verifier"
+  },
+  "instructions": [
+    {
+      "name": "verify_groth16_proof",
+      "docs": [
+        "Verify a Groth16 proof and store it if verification succeeds"
+      ],
+      "discriminator": [
+        54,
+        190,
+        59,
+        14,
+        54,
+        75,
+        155,
+        6
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "proof_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  114,
+                  111,
+                  116,
+                  104,
+                  49,
+                  54,
+                  95,
+                  112,
+                  114,
+                  111,
+                  111,
+                  102
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "authority"
+              },
+              {
+                "kind": "arg",
+                "path": "proof_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "proof_id",
+          "type": "string"
+        },
+        {
+          "name": "proof",
+          "type": {
+            "defined": {
+              "name": "Groth16Proof"
+            }
+          }
+        },
+        {
+          "name": "public_inputs",
+          "type": {
+            "defined": {
+              "name": "PublicInputs"
+            }
+          }
+        },
+        {
+          "name": "verifying_key",
+          "type": {
+            "defined": {
+              "name": "Groth16VerifyingKey"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "verify_risc0_proof",
+      "docs": [
+        "Verify a RISC0 proof and store it if verification succeeds"
+      ],
+      "discriminator": [
+        132,
+        175,
+        171,
+        187,
+        153,
+        247,
+        22,
+        212
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "proof_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  105,
+                  115,
+                  99,
+                  48,
+                  95,
+                  112,
+                  114,
+                  111,
+                  111,
+                  102
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "authority"
+              },
+              {
+                "kind": "arg",
+                "path": "proof_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "proof_id",
+          "type": "string"
+        },
+        {
+          "name": "proof",
+          "type": {
+            "defined": {
+              "name": "Risc0Proof"
+            }
+          }
+        },
+        {
+          "name": "image_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "journal_digest",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "VerifiedGroth16Proof",
+      "discriminator": [
+        130,
+        178,
+        2,
+        37,
+        203,
+        80,
+        13,
+        207
+      ]
+    },
+    {
+      "name": "VerifiedRisc0Proof",
+      "discriminator": [
+        115,
+        227,
+        154,
+        159,
+        35,
+        105,
+        205,
+        246
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidPublicInput",
+      "msg": "Invalid public input"
+    },
+    {
+      "code": 6001,
+      "name": "ArithmeticError",
+      "msg": "Arithmetic error in elliptic curve operations"
+    },
+    {
+      "code": 6002,
+      "name": "PairingError",
+      "msg": "Pairing operation failed"
+    },
+    {
+      "code": 6003,
+      "name": "VerificationError",
+      "msg": "Proof verification failed"
+    }
+  ],
+  "types": [
+    {
+      "name": "Groth16Proof",
+      "docs": [
+        "Groth16 proof elements on BN254 curve"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pi_a",
+            "type": {
+              "array": [
+                "u8",
+                64
+              ]
+            }
+          },
+          {
+            "name": "pi_b",
+            "type": {
+              "array": [
+                "u8",
+                128
+              ]
+            }
+          },
+          {
+            "name": "pi_c",
+            "type": {
+              "array": [
+                "u8",
+                64
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Groth16VerifyingKey",
+      "docs": [
+        "Groth16 verification key for our simple square circuit"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "alpha_g1",
+            "type": {
+              "array": [
+                "u8",
+                64
+              ]
+            }
+          },
+          {
+            "name": "beta_g2",
+            "type": {
+              "array": [
+                "u8",
+                128
+              ]
+            }
+          },
+          {
+            "name": "gamma_g2",
+            "type": {
+              "array": [
+                "u8",
+                128
+              ]
+            }
+          },
+          {
+            "name": "delta_g2",
+            "type": {
+              "array": [
+                "u8",
+                128
+              ]
+            }
+          },
+          {
+            "name": "ic",
+            "type": {
+              "vec": {
+                "array": [
+                  "u8",
+                  64
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "PublicInputs",
+      "docs": [
+        "Public inputs for proofs"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "inputs",
+            "type": {
+              "vec": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Risc0Proof",
+      "docs": [
+        "RISC0 proof structure"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pi_a",
+            "type": {
+              "array": [
+                "u8",
+                64
+              ]
+            }
+          },
+          {
+            "name": "pi_b",
+            "type": {
+              "array": [
+                "u8",
+                128
+              ]
+            }
+          },
+          {
+            "name": "pi_c",
+            "type": {
+              "array": [
+                "u8",
+                64
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "VerifiedGroth16Proof",
+      "docs": [
+        "Account to store verified Groth16 proofs"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "proof",
+            "type": {
+              "defined": {
+                "name": "Groth16Proof"
+              }
+            }
+          },
+          {
+            "name": "public_inputs",
+            "type": {
+              "defined": {
+                "name": "PublicInputs"
+              }
+            }
+          },
+          {
+            "name": "verifying_key_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "verified_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VerifiedRisc0Proof",
+      "docs": [
+        "Account to store verified RISC0 proofs"
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "proof",
+            "type": {
+              "defined": {
+                "name": "Risc0Proof"
+              }
+            }
+          },
+          {
+            "name": "image_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "journal_digest",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "verified_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}
