@@ -75,42 +75,6 @@ The web interface communicates with the rollup core server through HTTP endpoint
 - `POST /submit_transaction` - Submit new transactions
 - `POST /get_transaction` - Retrieve specific transactions or paginated lists
 
-## Development
-
-### Project Structure
-
-```
-rollup_web/
-├── app/                    # Next.js app directory
-│   ├── globals.css        # Global styles with Tailwind
-│   ├── layout.tsx         # Root layout component
-│   └── page.tsx           # Main rollup client page
-├── components/            # Reusable UI components
-│   ├── ui/               # Base UI components (button, card, input)
-│   └── transaction-creator.tsx # Transaction creation form
-├── lib/                   # Utility functions and API client
-│   ├── api.ts            # Rollup server API functions
-│   └── utils.ts          # Helper utilities
-└── public/               # Static assets
-```
-
-### Styling
-
-The project uses Tailwind CSS v4 with a design system inspired by shadcn/ui:
-
-- Consistent color palette with dark mode support
-- Responsive design patterns
-- Accessible UI components
-- Modern shadows and borders
-
-### Type Safety
-
-All components and API functions are fully typed with TypeScript:
-
-- Strict type checking for rollup transaction structures
-- Interface definitions for all API responses
-- Type-safe React components with proper prop validation
-
 ## Building for Production
 
 ```bash
@@ -143,4 +107,4 @@ Ensure the rollup core server is running and accessible. The web client expects 
 
 ## License
 
-This project is part of the ZKSVM rollup system.
+This project is part of the Zelana ZKSVM rollup system.

@@ -25,6 +25,7 @@ const ROLLUP_BASE_URL =
   process.env.NEXT_PUBLIC_ROLLUP_URL || "http://127.0.0.1:8080";
 
 export async function healthCheck(): Promise<{ [key: string]: string }> {
+  console.log("Rollup address: ", ROLLUP_BASE_URL)
   const response = await fetch(`${ROLLUP_BASE_URL}/`);
   if (!response.ok) {
     throw new Error("Health check failed");

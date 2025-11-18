@@ -5,11 +5,11 @@ import { TransactionCreator } from "@/components/transaction-creator";
 import { BatchTransactionCreator } from "@/components/batch-transaction-creator";
 import {
   healthCheck,
+  getTransaction,
   getTransactionsPage,
   type TransactionWithHash,
+  type RollupTransaction,
 } from "@/lib/api";
-import { usePrivy } from "@privy-io/react-auth";
-import { json } from "stream/consumers";
 
 interface HealthStatus {
   status: string;
@@ -22,12 +22,14 @@ export default function RollupClientPage() {
   const [transactions, setTransactions] = useState<TransactionWithHash[]>([]);
   const [isTransactionsLoading, setIsTransactionsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [transactionHash, setTransactionHash] = useState("");
+  const [searchResult, setSearchResult] = useState<RollupTransaction | null>(null);
+  const [isSearchLoading, setIsSearchLoading] = useState(false);
 
   // wallet state
   const [walletConnected, setWalletConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string>("");
   const [senderName, setSenderName] = useState("");
-  const { user, logout, authenticated, login } = usePrivy();
 
   const handleWalletConnect = (connected: boolean, address: string, name: string) => {
     setWalletConnected(connected);
@@ -35,38 +37,14 @@ export default function RollupClientPage() {
     setSenderName(name);
   };
 
-  if (!authenticated) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen px-4 bg-gray-50">
-        <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-lg w-full max-w-md">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Welcome to zkSVM
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Please sign in to access your dashboard
-            </p>
-            <button
-              onClick={login}
-              className="inline-block w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
-            >
-              Sign In
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // useEffect(() => {
-  //   const sol = (window)?.solana;
-  //   if (sol?.isConnected && sol.publicKey) {
-  //     setWalletConnected(true);
-  //     setWalletAddress(sol.publicKey.toString());
-  //     setSenderName("Phantom User");
-  //   }
-  // }, []);
-
+  useEffect(() => {
+    const sol = (window)?.solana;
+    if (sol?.isConnected && sol.publicKey) {
+      setWalletConnected(true);
+      setWalletAddress(sol.publicKey.toString());
+      setSenderName("Phantom User");
+    }
+  }, []);
 
   const performHealthCheck = async () => {
     setIsHealthLoading(true);
@@ -96,11 +74,23 @@ export default function RollupClientPage() {
     }
   };
 
+  const searchTransaction = async () => {
+    if (!transactionHash.trim()) return;
+    setIsSearchLoading(true);
+    try {
+      const result = await getTransaction(transactionHash.trim());
+      setSearchResult(result);
+    } catch (error) {
+      setSearchResult({ error: error instanceof Error ? error.message : "Unknown error" });
+    } finally {
+      setIsSearchLoading(false);
+    }
+  };
 
-  // useEffect(() => {
-  //   performHealthCheck();
-  //   loadTransactions();
-  // }, []);
+  useEffect(() => {
+    performHealthCheck();
+    loadTransactions();
+  }, []);
 
   // primitives
   const Card = ({
@@ -145,8 +135,8 @@ export default function RollupClientPage() {
       variant === "outline"
         ? "border border-slate-300/70 dark:border-slate-700/70 bg-transparent hover:bg-slate-100/60 dark:hover:bg-slate-800/60"
         : variant === "ghost"
-          ? "hover:bg-slate-100/60 dark:hover:bg-slate-800/60"
-          : "bg-indigo-600 text-white hover:bg-indigo-600/90";
+        ? "hover:bg-slate-100/60 dark:hover:bg-slate-800/60"
+        : "bg-indigo-600 text-white hover:bg-indigo-600/90";
     return (
       <button type={type} onClick={onClick} disabled={disabled} className={`${base} ${sizeCls} ${variants} disabled:opacity-60 ${className}`}>
         {children}
@@ -170,17 +160,6 @@ export default function RollupClientPage() {
             <Button onClick={performHealthCheck} disabled={isHealthLoading} size="sm">
               {isHealthLoading ? "Checking…" : "Health Check"}
             </Button>
-            <Button onClick={logout}>
-              Logout
-            </Button>
-            <p>{user?.wallet?.address!}</p>
-                       {user && (
-                        <div className="bg-gray-50 rounded-md p-4 overflow-auto">
-                            <pre className="text-sm text-gray-800">
-                                {JSON.stringify(user, null, 2)}
-                            </pre>
-                        </div>
-                    )}
           </div>
         </div>
       </div>
@@ -196,8 +175,9 @@ export default function RollupClientPage() {
                 <div className="text-xs font-medium text-slate-500">Network Status</div>
                 <div className="mt-2 flex items-center gap-2">
                   <span
-                    className={`size-2 rounded-full ${healthStatus?.status.includes("Error") ? "bg-rose-500" : "bg-emerald-500"
-                      }`}
+                    className={`size-2 rounded-full ${
+                      healthStatus?.status.includes("Error") ? "bg-rose-500" : "bg-emerald-500"
+                    }`}
                   />
                   <span className="text-xl font-semibold">
                     {healthStatus?.status.includes("Error") ? "Offline" : "Online"}
@@ -241,62 +221,105 @@ export default function RollupClientPage() {
           </Card>
         </div>
 
-        {/* Create Transactions */}
-        <section className="space-y-8">
-          <SectionTitle
-            title="Create Transactions"
-            subtitle="Build single or batched transactions. Submitting 3 in batch will trigger immediate L1 settlement."
-          />
-
-          {/* Batch creator full width */}
+        {/* Search */}
+        <section>
+          <SectionTitle title="Transaction Search" subtitle="Find a transaction by its signature hash" />
           <Card>
-            <div className="p-6">
-              <BatchTransactionCreator
-                onTransactionSubmitted={() => loadTransactions(currentPage)}
-                walletConnected={walletConnected}
-                walletAddress={walletAddress}
-                senderName={senderName}
-              />
+            <div className="p-6 space-y-4">
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Input
+                  placeholder="Enter transaction signature hash…"
+                  value={transactionHash}
+                  onChange={(e) => setTransactionHash(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && searchTransaction()}
+                  className="flex-1"
+                />
+                <Button onClick={searchTransaction} disabled={isSearchLoading || !transactionHash.trim()}>
+                  {isSearchLoading ? "Searching…" : "Search"}
+                </Button>
+              </div>
+
+              {searchResult && (
+                <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white/60 dark:bg-slate-900/50 p-4">
+                  <pre className="text-xs font-mono whitespace-pre-wrap break-all">
+                    {JSON.stringify(searchResult, null, 2)}
+                  </pre>
+                </div>
+              )}
             </div>
           </Card>
+        </section>
 
-          {/* Two-column: Health + Single creator */}
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-            <Card>
-              <div className="p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">System Health</h3>
-                  <Button onClick={performHealthCheck} disabled={isHealthLoading}>
-                    {isHealthLoading ? "Checking…" : "Run Health Check"}
+        {/* List */}
+        <section>
+          <SectionTitle title="Recent Transactions" subtitle="Latest transactions processed by the rollup" />
+          <Card>
+            <div className="p-5 space-y-5">
+              <div className="flex items-center justify-between gap-3">
+                <Button onClick={() => loadTransactions(currentPage)} disabled={isTransactionsLoading} variant="outline">
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Refresh
+                </Button>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    onClick={() => loadTransactions(Math.max(1, currentPage - 1))}
+                    disabled={isTransactionsLoading || currentPage <= 1}
+                    variant="outline"
+                    size="sm"
+                  >
+                    ‹ Prev
+                  </Button>
+                  <div className="px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700 text-sm">Page {currentPage}</div>
+                  <Button
+                    onClick={() => loadTransactions(currentPage + 1)}
+                    disabled={isTransactionsLoading || transactions.length < 10}
+                    variant="outline"
+                    size="sm"
+                  >
+                    Next ›
                   </Button>
                 </div>
+              </div>
 
-                {healthStatus && (
-                  <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white/60 dark:bg-slate-900/50 p-4">
-                    <code className="block text-xs font-mono break-all">{healthStatus.status}</code>
-                    <div className="mt-2 text-xs text-slate-500 flex items-center gap-2">
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      Last checked: {new Date(healthStatus.timestamp).toLocaleTimeString()}
-                    </div>
+              {isTransactionsLoading ? (
+                <div className="py-12 flex items-center justify-center text-slate-500">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-current mr-3" />
+                  Loading transactions…
+                </div>
+              ) : transactions.length ? (
+                <ul className="space-y-4">
+                  {transactions.map((tx, i) => (
+                    <li
+                      key={`${tx.hash}-${i}`}
+                      className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white/60 dark:bg-slate-900/50 p-4"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="font-mono text-xs sm:text-sm font-medium truncate max-w-[70%] bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-2 py-1 rounded">
+                          {tx.hash}
+                        </div>
+                        <div className="text-xs text-slate-500">#{i + 1}</div>
+                      </div>
+                      <pre className="text-[11px] sm:text-xs font-mono whitespace-pre-wrap break-all text-slate-600 dark:text-slate-300">
+                        {JSON.stringify(tx.transaction, null, 2)}
+                      </pre>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="py-12 text-center">
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-800 mb-4">
+                    <svg className="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586L18 8.414V19a2 2 0 01-2 2z" />
+                    </svg>
                   </div>
-                )}
-              </div>
-            </Card>
-
-            <Card>
-              <div className="p-6">
-                <TransactionCreator
-                  onTransactionSubmitted={() => loadTransactions(currentPage)}
-                  walletConnected={walletConnected}
-                  walletAddress={walletAddress}
-                  senderName={senderName}
-                  onWalletConnect={handleWalletConnect}
-                />
-              </div>
-            </Card>
-          </div>
+                  <div className="text-sm text-slate-500">No transactions yet. Create one above, or refresh.</div>
+                </div>
+              )}
+            </div>
+          </Card>
         </section>
       </div>
     </div>
