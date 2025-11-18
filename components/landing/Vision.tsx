@@ -4,10 +4,10 @@ import SectionIntro from "./SectionIntro";
 import { motion } from "framer-motion";
 
 const bullets = [
-  "Groth16 and Poseidon-based circuits with Solana-friendly tooling.",
-  "Operator consoles that explain proofs without exposing payloads.",
+  "Groth16 and Poseidon-based circuits with Rust-friendly tooling.",
+  "Explorers that explain proofs and transactions without exposing payloads or other details.",
   "Selective disclosure and view-key workflows for auditors.",
-  "Community partners who co-own the rollout milestones.",
+  "Community partners who contribute to the confidential system.",
 ];
 
 export default function Vision() {

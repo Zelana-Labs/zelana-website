@@ -23,7 +23,7 @@ export default function Mission() {
         <Card
           icon={<LayoutGrid className="h-5 w-5 text-zinc-900" />}
           title="Transparent intent"
-          body="Before explorers or dashboards, we’re publishing the foundational principles, governance model, and disclosure policies."
+          body="Before explorers or dashboards, we’re publishing the foundational principles. Looking at quantum resistant solutions and performance."
         />
       </div>
     </section>

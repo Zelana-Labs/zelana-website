@@ -16,16 +16,16 @@ export default function HeroPanel() {
       </div>
       <div className="space-y-4 text-sm text-zinc-600">
         <div>
-          <p className="font-semibold text-zinc-900">Circuit toolkit</p>
-          <p>Groth16 proving templates, Poseidon commitments, and test vectors for Solana programs.</p>
+          <p className="font-semibold text-zinc-900">Zero Knowledge VM</p>
+          <p>An encrypted transaction execution environment.</p>
         </div>
         <div>
-          <p className="font-semibold text-zinc-900">Operator console</p>
-          <p>Readable proof audits, disclosure toggles, and view-key management for early teams.</p>
+          <p className="font-semibold text-zinc-900">Encrypted bridge</p>
+          <p>Briding funds between the L1 and L2 by using committments</p>
         </div>
       </div>
       <div className="flex flex-wrap gap-2 text-[10px] uppercase tracking-[0.3em] text-zinc-500">
-        <span className="inline-flex items-center gap-1 rounded-full border border-zinc-200 px-3 py-1">design in public</span>
+        <span className="inline-flex items-center gap-1 rounded-full border border-zinc-200 px-3 py-1">build in public</span>
         <span className="inline-flex items-center gap-1 rounded-full border border-zinc-200 px-3 py-1">solana native</span>
       </div>
     </motion.div>

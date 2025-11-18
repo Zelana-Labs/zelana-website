@@ -25,20 +25,20 @@ export default function Hero() {
               <Bolt className="h-3 w-3" />
               zk rollup
             </span>
-            early stage build
+            devnet
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05, duration: 0.5 }} className="space-y-6">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight text-zinc-900">
-              A privacy mission for Solana builders.
+              A privacy mission for the Next Generation of builders.
             </h1>
             <p className="text-lg text-zinc-600 leading-relaxed max-w-2xl">
-              Zelana is an emerging ZK rollup exploring how proof systems, encrypted execution, and human-grade governance can give Solana and other chains a native privacy layer.
+              Zelana is an emerging ZK rollup exploring how proof systems and encrypted execution can give Solana and other chains a native privacy layer.
             </p>
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.4 }} className="flex flex-wrap gap-3">
-            <PrimaryButton href="/app">Follow the build</PrimaryButton>
+            <PrimaryButton href="https://x.com/zelanalabs">Follow along</PrimaryButton>
             <GhostButton href="mailto:hello@zelana.xyz">Reach out</GhostButton>
           </motion.div>
 
