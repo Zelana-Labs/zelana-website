@@ -173,7 +173,7 @@ export default function RollupClientPage() {
             <Button onClick={logout}>
               Logout
             </Button>
-            <p>{user?.wallet?.address!}</p>
+            <p>{user?.wallet?.address ?? "No wallet connected"}</p>
                        {user && (
                         <div className="bg-gray-50 rounded-md p-4 overflow-auto">
                             <pre className="text-sm text-gray-800">
