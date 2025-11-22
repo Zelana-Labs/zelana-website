@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: 'A privacy focused ZK rollup on Solana',
   openGraph: {
     title: 'Zelana - Next Generation of Privacy',
-    description: 'Your app description',
+    description: 'A privacy focused ZK rollup on Solana',
     url: 'https://zelana.org',
     siteName: 'Zelana',
     images: [
