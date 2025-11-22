@@ -18,7 +18,7 @@ export default function Footer() {
           
           {/* GitHub */}
           <a
-            href="https://github.com/zelanalabs"
+            href="https://github.com/zelana-labs"
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-1 hover:text-zinc-900 transition-colors"
