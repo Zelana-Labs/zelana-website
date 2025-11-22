@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     siteName: 'Zelana',
     images: [
       {
-        url: 'https://zelana.org/og-metadata-image.jpg',
+        url: 'https://zelana.org/og-metadata-image.png',
         width: 1200,
         height: 630,
         alt: 'Preview image',
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Zelana',
     description: 'A privacy focused ZK rollup on Solana',
-    images: ['https://zelana.org/og-metadata-image.jpg'],
+    images: ['https://zelana.org/og-metadata-image.png'],
   },
 }
 
