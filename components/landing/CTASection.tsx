@@ -15,8 +15,8 @@ export default function CTASection() {
             description="We’re inviting early partners to review specs, co-design governance, and pressure-test the first circuits."
           />
           <div className="flex flex-wrap gap-3">
-            <PrimaryButton href="mailto:hello@zelana.xyz">Say hello</PrimaryButton>
-            <GhostButton href="/app">Track progress</GhostButton>
+            <PrimaryButton href="mailto:hello@zelana.xyz">Get in touch</PrimaryButton>
+            <GhostButton href="https://x.com/zelanalabs">Track progress</GhostButton>
           </div>
         </div>
       </div>

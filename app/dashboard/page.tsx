@@ -9,7 +9,6 @@ import {
   type TransactionWithHash,
 } from "@/lib/api";
 import { usePrivy } from "@privy-io/react-auth";
-import { json } from "stream/consumers";
 
 interface HealthStatus {
   status: string;

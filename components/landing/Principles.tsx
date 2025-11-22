@@ -4,41 +4,64 @@ import SectionIntro from "./SectionIntro";
 import { motion } from "framer-motion";
 
 const principles = [
-  {
-    title: "Human-readable privacy.",
-    body: "Proofs, attestations, and failure states must be reviewable by people, not just services.",
+    {
+    title: "Integrity.",
+    body: "Everything we ship is open. No backdoors, no shortcuts",
   },
   {
-    title: "Composable from day one.",
-    body: "Everything we ship should drop into existing Solana workflows—RPC providers, indexers, and governance stacks.",
+    title: "Build for the future.",
+    body: "We build the future people will thank us for when the lights go out and freedom is all that’s left.",
   },
   {
-    title: "Selective transparency.",
-    body: "Auditors and regulators receive exactly what they need via view keys and expirations, nothing more.",
+    title: "As fast as possible.",
+    body: "Shipping at speed and making the systems as fast as possible.",
   },
 ];
 
 export default function Principles() {
   return (
-    <section className="max-w-6xl mx-auto px-6">
-      <div className="rounded-3xl border border-zinc-200 bg-white p-10 shadow-[0_25px_70px_rgba(15,23,42,0.08)]">
-        <SectionIntro eyebrow="Principles" title="How we’ll measure ourselves" description="We’ll release updates only when these checkpoints are met." />
-        <ul className="mt-8 space-y-5 text-zinc-600">
-          {principles.map((item) => (
+    <section className="max-w-6xl mx-auto px-6 py-20">
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.5 }}
+        className="relative rounded-3xl border border-zinc-200 bg-white/90 p-10 md:p-14 shadow-[0_25px_70px_rgba(15,23,42,0.08)] overflow-hidden"
+      >
+
+        <SectionIntro
+          eyebrow="Principles"
+          title="How we’ll measure ourselves"
+          description="Standards to die for and live by."
+        />
+
+        <ul className="mt-10 space-y-6 text-zinc-600 relative">
+          {principles.map((item, index) => (
             <motion.li
               key={item.title}
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -16 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.4 }}
-              className="leading-relaxed"
+              transition={{ duration: 0.35, delay: index * 0.05 }}
+              className="flex gap-4"
             >
-              <span className="font-semibold text-zinc-900">{item.title}</span> {item.body}
+              {/* Nummer badge */}
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-zinc-300 bg-zinc-50 text-xs font-medium text-zinc-700">
+                {index + 1}
+              </div>
+
+              <div className="space-y-1">
+                <h3 className="font-semibold text-zinc-900">
+                  {item.title}
+                </h3>
+                <p className="leading-relaxed">
+                  {item.body}
+                </p>
+              </div>
             </motion.li>
           ))}
         </ul>
-      </div>
+      </motion.div>
     </section>
   );
 }
-
