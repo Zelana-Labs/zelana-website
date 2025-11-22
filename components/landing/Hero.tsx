@@ -39,7 +39,7 @@ export default function Hero() {
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.4 }} className="flex flex-wrap gap-3">
             <PrimaryButton href="https://x.com/zelanalabs">Follow along</PrimaryButton>
-            <GhostButton href="mailto:hello@zelana.xyz">Reach out</GhostButton>
+            <GhostButton href="https://form.typeform.com/to/akKCUvuh">Contact us</GhostButton>
           </motion.div>
 
           {/* <motion.div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500">

@@ -55,7 +55,7 @@ function Navbar() {
 
         <div className="hidden md:flex items-center gap-2">
           <Link 
-            href="mailto:zelanalabs@gmail.com" 
+            href="https://form.typeform.com/to/akKCUvuh" 
             className="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50 transition-colors"
           >
             Contact
@@ -81,7 +81,7 @@ function Navbar() {
                 {link.label}
               </NavLink>
             ))} */}
-            <Link href="mailto:hello@zelana.xyz" className="rounded-md border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50">
+            <Link href="https://form.typeform.com/to/akKCUvuh" className="rounded-md border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50">
               Contact us
             </Link>
           </div>
