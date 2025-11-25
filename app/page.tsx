@@ -8,14 +8,27 @@ import Vision from "@/components/landing/Vision";
 import Principles from "@/components/landing/Principles";
 import CTASection from "@/components/landing/CTASection";
 import Footer from "@/components/landing/Footer";
+import IsometricCard from "../components/landing/IsometricCard";
+
 
 export default function LandingPage() {
+
+  const items = [
+    "🚀",
+    "Hello",
+    "📦",
+    <div className="text-xs">Small<br />Text</div>,
+    "✨",
+    <img src="/logo.svg" className="w-8 h-8 mx-auto" />,
+  ];
   return (
     <div className="min-h-screen bg-white text-zinc-900">
       <GradientBG />
-   
+
       <main className="relative z-10 space-y-32 pb-40">
         <Hero />
+        {/* <IsometricCard items={items} /> */}
+        <IsometricCard/>
         <Mission />
         <Vision />
         <Principles />
