@@ -5,7 +5,7 @@ import Providers from '@/components/Providers' // You'll need to create this
 import Navbar from '@/components/ui/Navbar'
 
 export const metadata: Metadata = {
-  title: 'Zelana',
+  title: 'Zelana - Privacy focused ZK rollup',
   description: 'A privacy focused ZK rollup on Solana. Exploring solutions that enchance privacy from the ground up.',
   keywords: [
     "Solana", "Solana zk rollup", "Solana rollup", "rollup", "zk rollup", "L2", "Solana L2", "zero-knowledge"
