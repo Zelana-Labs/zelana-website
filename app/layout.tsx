@@ -1,6 +1,7 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
 import { Metadata } from 'next'
+import { Analytics } from '@vercel/analytics/next'
 import Providers from '@/components/Providers' // You'll need to create this
 import Navbar from '@/components/ui/Navbar'
 
@@ -75,6 +76,7 @@ export default function RootLayout({
           <Navbar />
           {children}
         </Providers>
+        <Analytics />
       </body>
     </html>
   )
