@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TransactionCreator } from "@/components/transaction-creator";
-import { BatchTransactionCreator } from "@/components/batch-transaction-creator";
+import { TransactionCreator } from "@/components/dashboard/transaction-creator";
+import { BatchTransactionCreator } from "@/components/dashboard/batch-transaction-creator";
 import {
   healthCheck,
   getTransaction,

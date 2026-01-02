@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TransactionCreator } from "@/components/transaction-creator";
-import { BatchTransactionCreator } from "@/components/batch-transaction-creator";
+import { TransactionCreator } from "@/components/dashboard/transaction-creator";
+import { BatchTransactionCreator } from "@/components/dashboard/batch-transaction-creator";
 import {
   healthCheck,
   getTransactionsPage,
@@ -21,51 +21,16 @@ export default function RollupClientPage() {
   const [transactions, setTransactions] = useState<TransactionWithHash[]>([]);
   const [isTransactionsLoading, setIsTransactionsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showUserInfo, setShowUserInfo] = useState(false);
 
-  // wallet state
-  const [walletConnected, setWalletConnected] = useState(false);
-  const [walletAddress, setWalletAddress] = useState<string>("");
-  const [senderName, setSenderName] = useState("");
   const { user, logout, authenticated, login } = usePrivy();
 
-  const handleWalletConnect = (connected: boolean, address: string, name: string) => {
-    setWalletConnected(connected);
-    setWalletAddress(address);
-    setSenderName(name);
-  };
-
-  if (!authenticated) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen px-4 bg-gray-50">
-        <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-lg w-full max-w-md">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Welcome to zkSVM
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Please sign in to access your dashboard
-            </p>
-            <button
-              onClick={login}
-              className="inline-block w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
-            >
-              Sign In
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // useEffect(() => {
-  //   const sol = (window)?.solana;
-  //   if (sol?.isConnected && sol.publicKey) {
-  //     setWalletConnected(true);
-  //     setWalletAddress(sol.publicKey.toString());
-  //     setSenderName("Phantom User");
-  //   }
-  // }, []);
-
+  useEffect(() => {
+    if (authenticated) {
+      performHealthCheck();
+      loadTransactions();
+    }
+  }, [authenticated]);
 
   const performHealthCheck = async () => {
     setIsHealthLoading(true);
@@ -95,209 +60,318 @@ export default function RollupClientPage() {
     }
   };
 
-
-  // useEffect(() => {
-  //   performHealthCheck();
-  //   loadTransactions();
-  // }, []);
-
-  // primitives
-  const Card = ({
-    children,
-    className = "",
-  }: {
-    children: React.ReactNode;
-    className?: string;
-  }) => (
-    <section className={`rounded-2xl border bg-white/80 dark:bg-slate-900/70 ring-1 ring-black/5 dark:ring-white/10 shadow-md ${className}`}>
-      {children}
-    </section>
-  );
-
-  const SectionTitle = ({ title, subtitle }: { title: string; subtitle?: string }) => (
-    <div className="mb-6">
-      <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
-      {subtitle && <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>}
-    </div>
-  );
-
-  const Button = ({
-    children,
-    onClick,
-    disabled,
-    variant = "solid",
-    size = "md",
-    className = "",
-    type = "button",
-  }: {
-    children: React.ReactNode;
-    onClick?: () => void;
-    disabled?: boolean;
-    variant?: "solid" | "outline" | "ghost";
-    size?: "sm" | "md" | "lg";
-    className?: string;
-    type?: "button" | "submit" | "reset";
-  }) => {
-    const sizeCls = size === "lg" ? "h-12 px-6" : size === "sm" ? "h-9 px-3 text-sm" : "h-10 px-4";
-    const base = "inline-flex items-center justify-center rounded-xl font-medium transition focus:outline-none focus:ring-4 ring-indigo-500/20";
-    const variants =
-      variant === "outline"
-        ? "border border-slate-300/70 dark:border-slate-700/70 bg-transparent hover:bg-slate-100/60 dark:hover:bg-slate-800/60"
-        : variant === "ghost"
-          ? "hover:bg-slate-100/60 dark:hover:bg-slate-800/60"
-          : "bg-indigo-600 text-white hover:bg-indigo-600/90";
+  // Login screen - white background like main site
+  if (!authenticated) {
     return (
-      <button type={type} onClick={onClick} disabled={disabled} className={`${base} ${sizeCls} ${variants} disabled:opacity-60 ${className}`}>
-        {children}
-      </button>
-    );
-  };
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
+        <style jsx>{`
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          .fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+          }
+          .delay-1 { animation-delay: 0.1s; opacity: 0; }
+        `}</style>
 
-  const Input = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
-    <input
-      {...props}
-      className={`h-11 w-full rounded-xl border border-slate-300/70 dark:border-slate-700/70 bg-white/70 dark:bg-slate-900/60 px-3 text-sm outline-none focus:ring-4 ring-indigo-500/20 ${props.className ?? ""}`}
-    />
-  );
+        <div className="w-full max-w-sm space-y-8">
+          {/* Logo */}
+          <div className="text-center fade-in">
+
+            <h1 className="text-xl font-light text-black tracking-tight">
+              Zelana Dashboard
+            </h1>
+          </div>
+
+          {/* Sign In Button */}
+          <div className="space-y-4 fade-in delay-1">
+            <button
+              onClick={login}
+              className="w-full bg-black hover:bg-gray-900 text-white py-3.5 rounded-2xl text-sm font-medium tracking-wide transition-all"
+            >
+              Sign In
+            </button>
+            <p className="text-center text-xs text-gray-400 font-light">
+              Privacy-focused zkSVM on Solana
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const isOnline = healthStatus && !healthStatus.status.includes("Error");
+
+  // Loading state
+  if (!healthStatus && isHealthLoading) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <style jsx>{`
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+          @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+          }
+          @keyframes fadeInScale {
+            from { 
+              opacity: 0; 
+              transform: scale(0.9);
+            }
+            to { 
+              opacity: 1; 
+              transform: scale(1);
+            }
+          }
+          .spinner {
+            animation: spin 1s linear infinite;
+          }
+          .pulse {
+            animation: pulse 2s ease-in-out infinite;
+          }
+          .fade-in-scale {
+            animation: fadeInScale 0.8s ease-out forwards;
+          }
+        `}</style>
+        
+        <div className="text-center space-y-6 fade-in-scale">
+          <div className="relative inline-flex items-center justify-center">
+            {/* Spinning ring */}
+            <div className="spinner w-16 h-16 border-2 border-white/10 border-t-emerald-400 rounded-full"></div>
+            {/* Center logo */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-white/60 font-semibold text-xl">Z</span>
+            </div>
+          </div>
+          <div className="pulse text-sm text-white/40 uppercase tracking-widest">
+            Loading Dashboard...
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(60rem_60rem_at_90%_-10%,rgba(99,102,241,.2),transparent),radial-gradient(50rem_50rem_at_-10%_10%,rgba(16,185,129,.15),transparent)]">
-      {/* Sticky top actions */}
-      <div className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-slate-900/60 border-b border-black/5 dark:border-white/10">
-        <div className="mx-auto max-w-7xl px-4 py-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-2">
-            <Button onClick={performHealthCheck} disabled={isHealthLoading} size="sm">
-              {isHealthLoading ? "Checking…" : "Health Check"}
-            </Button>
-            <Button onClick={logout}>
-              Logout
-            </Button>
-            <p>{user?.wallet?.address ?? "No wallet connected"}</p>
-                       {user && (
-                        <div className="bg-gray-50 rounded-md p-4 overflow-auto">
-                            <pre className="text-sm text-gray-800">
-                                {JSON.stringify(user, null, 2)}
-                            </pre>
-                        </div>
-                    )}
+    <div className="min-h-screen bg-[#0a0a0a]">
+      <style jsx>{`
+        @keyframes slideInFromTop {
+          from {
+            opacity: 0;
+            transform: translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes slideInFromBottom {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes fadeInScale {
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        .slide-in-top {
+          animation: slideInFromTop 0.6s ease-out forwards;
+        }
+        .slide-in-bottom {
+          animation: slideInFromBottom 0.6s ease-out forwards;
+        }
+        .fade-in-scale {
+          animation: fadeInScale 0.6s ease-out forwards;
+        }
+        .delay-100 { animation-delay: 0.1s; opacity: 0; }
+        .delay-200 { animation-delay: 0.2s; opacity: 0; }
+        .delay-300 { animation-delay: 0.3s; opacity: 0; }
+        .delay-400 { animation-delay: 0.4s; opacity: 0; }
+        .delay-500 { animation-delay: 0.5s; opacity: 0; }
+      `}</style>
+
+      {/* Main Content */}
+      <main className="max-w-6xl mx-auto px-6 lg:px-8 py-8">
+        
+        {/* User Info Bar */}
+        <div className="slide-in-top flex items-center justify-between mb-8 bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-white/5 px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center">
+              <span className="text-white text-xs font-medium">
+                {user?.email?.address?.[0]?.toUpperCase() || "U"}
+              </span>
+            </div>
+            <button
+              onClick={() => setShowUserInfo(!showUserInfo)}
+              className="text-sm text-white/60 hover:text-white transition-colors"
+            >
+              {user?.wallet?.address 
+                ? `${user.wallet.address.slice(0, 6)}...${user.wallet.address.slice(-4)}`
+                : user?.email?.address || "Account"}
+            </button>
+          </div>
+          
+          <button
+            onClick={logout}
+            className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs font-medium text-white/80 transition-all"
+          >
+            Logout
+          </button>
+        </div>
+
+        {/* User Info Dropdown */}
+        {showUserInfo && user && (
+          <div className="mb-8 bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-white/5 p-6">
+            <div className="flex items-start justify-between mb-4">
+              <span className="text-xs font-semibold uppercase tracking-wider text-white/40">User Details</span>
+              <button 
+                onClick={() => setShowUserInfo(false)}
+                className="text-white/40 hover:text-white transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <pre className="text-xs text-white/60 overflow-auto max-h-48 font-mono bg-black/40 border border-white/5 rounded-xl p-4">
+              {JSON.stringify(user, null, 2)}
+            </pre>
+          </div>
+        )}
+        
+        {/* Stats - Gamified Cards */}
+        <div className="grid grid-cols-3 gap-4 mb-10">
+          {/* Network Status */}
+          <div className="fade-in-scale delay-100 bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-white/5 p-5 hover:border-white/20 transition-all group">
+            <div className="flex items-start justify-between mb-3">
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-white/40">Network</span>
+              <span className={`w-2 h-2 rounded-full ${isOnline ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]" : "bg-white/20"}`} />
+            </div>
+            <div className="text-lg font-semibold text-white">
+              {isOnline ? "Online" : "Offline"}
+            </div>
+          </div>
+
+          {/* Transactions */}
+          <div className="fade-in-scale delay-200 bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-white/5 p-5 hover:border-white/20 transition-all">
+            <div className="text-[10px] font-semibold uppercase tracking-widest text-white/40 mb-3">Transactions</div>
+            <div className="text-lg font-semibold text-white">
+              {isTransactionsLoading ? "—" : transactions.length}
+            </div>
+          </div>
+
+          {/* Page */}
+          <div className="fade-in-scale delay-300 bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-white/5 p-5 hover:border-white/20 transition-all">
+            <div className="text-[10px] font-semibold uppercase tracking-widest text-white/40 mb-3">Page</div>
+            <div className="text-lg font-semibold text-white">
+              {currentPage}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Page container */}
-      <div className="mx-auto max-w-7xl px-4 py-10 space-y-10">
+        {/* Transactions Section */}
+        <div className="space-y-8">
+          {/* Section Header */}
+          <div className="slide-in-bottom delay-400 flex items-center gap-3">
+            <div className="flex-1 h-px bg-gradient-to-r from-white/0 via-white/10 to-white/0" />
+            <h2 className="text-sm font-semibold text-white/80 uppercase tracking-widest">Create Transactions</h2>
+            <div className="flex-1 h-px bg-gradient-to-r from-white/0 via-white/10 to-white/0" />
+          </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          <Card>
-            <div className="p-5 flex items-center justify-between">
-              <div>
-                <div className="text-xs font-medium text-slate-500">Network Status</div>
-                <div className="mt-2 flex items-center gap-2">
-                  <span
-                    className={`size-2 rounded-full ${healthStatus?.status.includes("Error") ? "bg-rose-500" : "bg-emerald-500"
-                      }`}
-                  />
-                  <span className="text-xl font-semibold">
-                    {healthStatus?.status.includes("Error") ? "Offline" : "Online"}
-                  </span>
-                </div>
+          {/* Two Column Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Batch Creator */}
+            <div className="slide-in-bottom delay-500 space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-4 bg-white/60 rounded-full" />
+                <h3 className="text-xs font-semibold text-white/60 uppercase tracking-widest">Batch Transaction</h3>
               </div>
-              <div className="rounded-xl bg-indigo-100 text-indigo-700 p-2 dark:bg-indigo-900/30 dark:text-indigo-300">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-            </div>
-          </Card>
-
-          <Card>
-            <div className="p-5 flex items-center justify-between">
-              <div>
-                <div className="text-xs font-medium text-slate-500">Total Transactions</div>
-                <div className="mt-2 text-xl font-semibold">{transactions.length}</div>
-              </div>
-              <div className="rounded-xl bg-indigo-100 text-indigo-700 p-2 dark:bg-indigo-900/30 dark:text-indigo-300">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586l5.707 5.707" />
-                </svg>
-              </div>
-            </div>
-          </Card>
-
-          <Card>
-            <div className="p-5 flex items-center justify-between">
-              <div>
-                <div className="text-xs font-medium text-slate-500">Current Page</div>
-                <div className="mt-2 text-xl font-semibold">{currentPage}</div>
-              </div>
-              <div className="rounded-xl bg-indigo-100 text-indigo-700 p-2 dark:bg-indigo-900/30 dark:text-indigo-300">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4V2h10v2m-12 2h14v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6z" />
-                </svg>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Create Transactions */}
-        <section className="space-y-8">
-          <SectionTitle
-            title="Create Transactions"
-            subtitle="Build single or batched transactions. Submitting 3 in batch will trigger immediate L1 settlement."
-          />
-
-          {/* Batch creator full width */}
-          <Card>
-            <div className="p-6">
-              <BatchTransactionCreator
-                onTransactionSubmitted={() => loadTransactions(currentPage)}
-                walletConnected={walletConnected}
-                walletAddress={walletAddress}
-                senderName={senderName}
-              />
-            </div>
-          </Card>
-
-          {/* Two-column: Health + Single creator */}
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-            <Card>
-              <div className="p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">System Health</h3>
-                  <Button onClick={performHealthCheck} disabled={isHealthLoading}>
-                    {isHealthLoading ? "Checking…" : "Run Health Check"}
-                  </Button>
-                </div>
-
-                {healthStatus && (
-                  <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white/60 dark:bg-slate-900/50 p-4">
-                    <code className="block text-xs font-mono break-all">{healthStatus.status}</code>
-                    <div className="mt-2 text-xs text-slate-500 flex items-center gap-2">
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      Last checked: {new Date(healthStatus.timestamp).toLocaleTimeString()}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </Card>
-
-            <Card>
-              <div className="p-6">
-                <TransactionCreator
+              <div className="bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-white/5 p-6 hover:border-white/10 transition-all">
+                <BatchTransactionCreator
                   onTransactionSubmitted={() => loadTransactions(currentPage)}
-                  walletConnected={walletConnected}
-                  walletAddress={walletAddress}
-                  senderName={senderName}
-                  onWalletConnect={handleWalletConnect}
+                  walletConnected={!!user?.wallet?.address}
+                  walletAddress={user?.wallet?.address || ""}
+                  senderName={user?.email?.address || user?.wallet?.address || "User"}
                 />
               </div>
-            </Card>
+            </div>
+
+            {/* Single Transaction */}
+            <div className="slide-in-bottom delay-500 space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-4 bg-white/60 rounded-full" />
+                <h3 className="text-xs font-semibold text-white/60 uppercase tracking-widest">Single Transaction</h3>
+              </div>
+              <div className="bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-white/5 p-6 hover:border-white/10 transition-all">
+                <TransactionCreator
+                  onTransactionSubmitted={() => loadTransactions(currentPage)}
+                  walletConnected={!!user?.wallet?.address}
+                  walletAddress={user?.wallet?.address || ""}
+                  senderName={user?.email?.address || user?.wallet?.address || "User"}
+                  onWalletConnect={() => {}}
+                />
+              </div>
+            </div>
           </div>
-        </section>
-      </div>
+
+          {/* System Health */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-4 bg-white/60 rounded-full" />
+                <h3 className="text-xs font-semibold text-white/60 uppercase tracking-widest">System Health</h3>
+              </div>
+              <button
+                onClick={performHealthCheck}
+                disabled={isHealthLoading}
+                className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs font-medium text-white/80 transition-all disabled:opacity-30"
+              >
+                {isHealthLoading ? "Checking..." : "Run Check"}
+              </button>
+            </div>
+
+            <div className="bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-white/5 p-6">
+              {healthStatus ? (
+                <div className="space-y-4">
+                  <code className="block text-sm font-mono text-white/60 break-all leading-relaxed">
+                    {healthStatus.status}
+                  </code>
+                  <div className="text-xs font-medium uppercase tracking-wide text-white/30 pt-4 border-t border-white/5">
+                    {new Date(healthStatus.timestamp).toLocaleString()}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="text-sm text-white/30 uppercase tracking-wide">
+                    No health check performed
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-white/5 mt-20">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8 py-8">
+          <div className="text-xs text-white/30 text-center uppercase tracking-widest">
+            Privacy-focused zkSVM on Solana
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

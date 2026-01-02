@@ -3,7 +3,6 @@ import { Inter } from 'next/font/google'
 import { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/next'
 import Providers from '@/components/Providers' // You'll need to create this
-import Navbar from '@/components/ui/Navbar'
 
 export const metadata: Metadata = {
   title: 'Zelana - Privacy focused ZK rollup',
