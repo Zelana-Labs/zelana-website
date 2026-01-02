@@ -9,7 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@privy-io/react-auth": "^1.27.0",
+    "@privy-io/react-auth": "^3.10.0",
+    "@solana-program/memo": "^0.10.0",
+    "@solana-program/system": "^0.10.0",
     "@solana/wallet-adapter-base": "^0.9.23",
     "@solana/wallet-adapter-react": "^0.15.35",
     "@solana/wallet-adapter-react-ui": "^0.9.35",
