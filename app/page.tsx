@@ -8,12 +8,13 @@ import Vision from "@/components/landing/Vision";
 import Principles from "@/components/landing/Principles";
 import CTASection from "@/components/landing/CTASection";
 import Footer from "@/components/landing/Footer";
+import Navbar from "@/components/ui/Navbar";
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white text-zinc-900">
       <GradientBG />
-   
+       <Navbar />
       <main className="relative z-10 space-y-32 pb-40">
         <Hero />
         <Mission />
