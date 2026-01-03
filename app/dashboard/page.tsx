@@ -1,64 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TransactionCreator } from "@/components/dashboard/transaction-creator";
-import { BatchTransactionCreator } from "@/components/dashboard/batch-transaction-creator";
-import {
-  healthCheck,
-  getTransactionsPage,
-  type TransactionWithHash,
-} from "@/lib/api";
-import { usePrivy } from "@privy-io/react-auth";
+//import { TransactionCreator } from "@/components/dashboard/transaction-creator";
 
-interface HealthStatus {
-  status: string;
-  timestamp: number;
-}
+import { usePrivy } from "@privy-io/react-auth";
+import { MemoTest } from "@/components/dashboard/memotest";
+import { L2Bridge } from "@/components/dashboard/l2bridge";
+
 
 export default function RollupClientPage() {
-  const [healthStatus, setHealthStatus] = useState<HealthStatus | null>(null);
-  const [isHealthLoading, setIsHealthLoading] = useState(false);
-  const [transactions, setTransactions] = useState<TransactionWithHash[]>([]);
-  const [isTransactionsLoading, setIsTransactionsLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const [showUserInfo, setShowUserInfo] = useState(false);
 
   const { user, logout, authenticated, login } = usePrivy();
 
   useEffect(() => {
     if (authenticated) {
-      performHealthCheck();
-      loadTransactions();
     }
   }, [authenticated]);
 
-  const performHealthCheck = async () => {
-    setIsHealthLoading(true);
-    try {
-      const result = await healthCheck();
-      setHealthStatus({ status: JSON.stringify(result), timestamp: Date.now() });
-    } catch (error) {
-      setHealthStatus({
-        status: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
-        timestamp: Date.now(),
-      });
-    } finally {
-      setIsHealthLoading(false);
-    }
-  };
 
-  const loadTransactions = async (page = 1) => {
-    setIsTransactionsLoading(true);
-    try {
-      const result = await getTransactionsPage(page, 10);
-      setTransactions(result.transactions);
-      setCurrentPage(page);
-    } catch (e) {
-      console.error("Failed to load transactions:", e);
-    } finally {
-      setIsTransactionsLoading(false);
-    }
-  };
+
 
   // Login screen - white background like main site
   if (!authenticated) {
@@ -78,7 +39,6 @@ export default function RollupClientPage() {
         <div className="w-full max-w-sm space-y-8">
           {/* Logo */}
           <div className="text-center fade-in">
-
             <h1 className="text-xl font-light text-black tracking-tight">
               Zelana Dashboard
             </h1>
@@ -101,57 +61,7 @@ export default function RollupClientPage() {
     );
   }
 
-  const isOnline = healthStatus && !healthStatus.status.includes("Error");
 
-  // Loading state
-  if (!healthStatus && isHealthLoading) {
-    return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <style jsx>{`
-          @keyframes spin {
-            to { transform: rotate(360deg); }
-          }
-          @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-          }
-          @keyframes fadeInScale {
-            from { 
-              opacity: 0; 
-              transform: scale(0.9);
-            }
-            to { 
-              opacity: 1; 
-              transform: scale(1);
-            }
-          }
-          .spinner {
-            animation: spin 1s linear infinite;
-          }
-          .pulse {
-            animation: pulse 2s ease-in-out infinite;
-          }
-          .fade-in-scale {
-            animation: fadeInScale 0.8s ease-out forwards;
-          }
-        `}</style>
-        
-        <div className="text-center space-y-6 fade-in-scale">
-          <div className="relative inline-flex items-center justify-center">
-            {/* Spinning ring */}
-            <div className="spinner w-16 h-16 border-2 border-white/10 border-t-emerald-400 rounded-full"></div>
-            {/* Center logo */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-white/60 font-semibold text-xl">Z</span>
-            </div>
-          </div>
-          <div className="pulse text-sm text-white/40 uppercase tracking-widest">
-            Loading Dashboard...
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
@@ -204,7 +114,7 @@ export default function RollupClientPage() {
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-6 lg:px-8 py-8">
-        
+
         {/* User Info Bar */}
         <div className="slide-in-top flex items-center justify-between mb-8 bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-white/5 px-6 py-4">
           <div className="flex items-center gap-3">
@@ -217,12 +127,12 @@ export default function RollupClientPage() {
               onClick={() => setShowUserInfo(!showUserInfo)}
               className="text-sm text-white/60 hover:text-white transition-colors"
             >
-              {user?.wallet?.address 
+              {user?.wallet?.address
                 ? `${user.wallet.address.slice(0, 6)}...${user.wallet.address.slice(-4)}`
                 : user?.email?.address || "Account"}
             </button>
           </div>
-          
+
           <button
             onClick={logout}
             className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs font-medium text-white/80 transition-all"
@@ -236,7 +146,7 @@ export default function RollupClientPage() {
           <div className="mb-8 bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-white/5 p-6">
             <div className="flex items-start justify-between mb-4">
               <span className="text-xs font-semibold uppercase tracking-wider text-white/40">User Details</span>
-              <button 
+              <button
                 onClick={() => setShowUserInfo(false)}
                 className="text-white/40 hover:text-white transition-colors"
               >
@@ -250,36 +160,6 @@ export default function RollupClientPage() {
             </pre>
           </div>
         )}
-        
-        {/* Stats - Gamified Cards */}
-        <div className="grid grid-cols-3 gap-4 mb-10">
-          {/* Network Status */}
-          <div className="fade-in-scale delay-100 bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-white/5 p-5 hover:border-white/20 transition-all group">
-            <div className="flex items-start justify-between mb-3">
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-white/40">Network</span>
-              <span className={`w-2 h-2 rounded-full ${isOnline ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]" : "bg-white/20"}`} />
-            </div>
-            <div className="text-lg font-semibold text-white">
-              {isOnline ? "Online" : "Offline"}
-            </div>
-          </div>
-
-          {/* Transactions */}
-          <div className="fade-in-scale delay-200 bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-white/5 p-5 hover:border-white/20 transition-all">
-            <div className="text-[10px] font-semibold uppercase tracking-widest text-white/40 mb-3">Transactions</div>
-            <div className="text-lg font-semibold text-white">
-              {isTransactionsLoading ? "—" : transactions.length}
-            </div>
-          </div>
-
-          {/* Page */}
-          <div className="fade-in-scale delay-300 bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-white/5 p-5 hover:border-white/20 transition-all">
-            <div className="text-[10px] font-semibold uppercase tracking-widest text-white/40 mb-3">Page</div>
-            <div className="text-lg font-semibold text-white">
-              {currentPage}
-            </div>
-          </div>
-        </div>
 
         {/* Transactions Section */}
         <div className="space-y-8">
@@ -288,6 +168,17 @@ export default function RollupClientPage() {
             <div className="flex-1 h-px bg-gradient-to-r from-white/0 via-white/10 to-white/0" />
             <h2 className="text-sm font-semibold text-white/80 uppercase tracking-widest">Create Transactions</h2>
             <div className="flex-1 h-px bg-gradient-to-r from-white/0 via-white/10 to-white/0" />
+          </div>
+
+          {/* L2 Bridge */}
+          <div className="slide-in-bottom delay-500 space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-4 bg-white/60 rounded-full" />
+              <h3 className="text-xs font-semibold text-white/60 uppercase tracking-widest">L2 Bridge</h3>
+            </div>
+            <div className="bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-white/5 p-6 hover:border-white/10 transition-all">
+              <L2Bridge />
+            </div>
           </div>
 
           {/* Two Column Layout */}
@@ -299,12 +190,6 @@ export default function RollupClientPage() {
                 <h3 className="text-xs font-semibold text-white/60 uppercase tracking-widest">Batch Transaction</h3>
               </div>
               <div className="bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-white/5 p-6 hover:border-white/10 transition-all">
-                <BatchTransactionCreator
-                  onTransactionSubmitted={() => loadTransactions(currentPage)}
-                  walletConnected={!!user?.wallet?.address}
-                  walletAddress={user?.wallet?.address || ""}
-                  senderName={user?.email?.address || user?.wallet?.address || "User"}
-                />
               </div>
             </div>
 
@@ -315,50 +200,23 @@ export default function RollupClientPage() {
                 <h3 className="text-xs font-semibold text-white/60 uppercase tracking-widest">Single Transaction</h3>
               </div>
               <div className="bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-white/5 p-6 hover:border-white/10 transition-all">
-                <TransactionCreator
-                  onTransactionSubmitted={() => loadTransactions(currentPage)}
+                {/* <TransactionCreator
                   walletConnected={!!user?.wallet?.address}
                   walletAddress={user?.wallet?.address || ""}
                   senderName={user?.email?.address || user?.wallet?.address || "User"}
-                  onWalletConnect={() => {}}
-                />
+                  onWalletConnect={() => { }}
+                /> */}
               </div>
             </div>
           </div>
-
-          {/* System Health */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-1 h-4 bg-white/60 rounded-full" />
-                <h3 className="text-xs font-semibold text-white/60 uppercase tracking-widest">System Health</h3>
-              </div>
-              <button
-                onClick={performHealthCheck}
-                disabled={isHealthLoading}
-                className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs font-medium text-white/80 transition-all disabled:opacity-30"
-              >
-                {isHealthLoading ? "Checking..." : "Run Check"}
-              </button>
+          {/* Memo test */}
+          <div className="slide-in-bottom delay-500 space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-4 bg-white/60 rounded-full" />
+              <h3 className="text-xs font-semibold text-white/60 uppercase tracking-widest">Memo test</h3>
             </div>
-
-            <div className="bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-white/5 p-6">
-              {healthStatus ? (
-                <div className="space-y-4">
-                  <code className="block text-sm font-mono text-white/60 break-all leading-relaxed">
-                    {healthStatus.status}
-                  </code>
-                  <div className="text-xs font-medium uppercase tracking-wide text-white/30 pt-4 border-t border-white/5">
-                    {new Date(healthStatus.timestamp).toLocaleString()}
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <div className="text-sm text-white/30 uppercase tracking-wide">
-                    No health check performed
-                  </div>
-                </div>
-              )}
+            <div className="bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-white/5 p-6 hover:border-white/10 transition-all">
+              <MemoTest />
             </div>
           </div>
         </div>

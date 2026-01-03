@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Bolt, ClipboardCopy, CopyCheck, ArrowRight, Shield } from "lucide-react";
+import { Bolt, ClipboardCopy, CopyCheck, ArrowRight } from "lucide-react";
 import HeroPanel from "./HeroPanel";
 
 

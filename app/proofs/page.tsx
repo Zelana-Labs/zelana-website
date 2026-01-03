@@ -111,8 +111,6 @@ function parseVerifiedGroth16Proof(data: Buffer): Omit<VerifiedGroth16Proof, "pu
 const fmtDate = (secs: number) =>
     isFinite(secs) && secs > 0 ? new Date(secs * 1000).toLocaleString() : "—";
 
-const short = (s: string, n = 8) => (s.length <= 2 * n + 3 ? s : `${s.slice(0, n)}…${s.slice(-n)}`);
-
 const copy = async (text: string) => {
     try { await navigator.clipboard.writeText(text); } catch { }
 };

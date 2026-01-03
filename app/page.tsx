@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-import { X, Github } from "lucide-react";
 import Hero from "@/components/landing/Hero";
 import Mission from "@/components/landing/Mission";
 import Vision from "@/components/landing/Vision";

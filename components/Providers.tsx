@@ -14,8 +14,12 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         solana: {
           rpcs: {
             'solana:mainnet': {
-              rpc: createSolanaRpc('https://api.mainnet-beta.solana.com'),
-              rpcSubscriptions: createSolanaRpcSubscriptions('wss://api.mainnet-beta.solana.com')
+              rpc: createSolanaRpc('http://127.0.0.1:8899'),
+              rpcSubscriptions: createSolanaRpcSubscriptions('ws://127.0.0.1:8900')
+            },
+            'solana:devnet': {
+              rpc: createSolanaRpc('http://127.0.0.1:8899'),
+              rpcSubscriptions: createSolanaRpcSubscriptions('ws://127.0.0.1:8900')
             }
           }
         },
