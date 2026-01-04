@@ -85,7 +85,7 @@ export function L2Bridge() {
     const { signAndSendTransaction } = useSignAndSendTransaction();
 
     const wallet = wallets[0];
-    
+
     const [selectedPreset, setSelectedPreset] = useState<keyof typeof RPC_PRESETS>("devnet");
     const [customRpcUrl, setCustomRpcUrl] = useState("");
     const [isCustomRpc, setIsCustomRpc] = useState(false);
@@ -291,7 +291,7 @@ export function L2Bridge() {
 
     const getExplorerUrl = (sig: string) => {
         const baseUrl = "https://explorer.solana.com/tx/" + sig;
-        
+
         if (cluster === "localhost") {
             return `${baseUrl}?cluster=custom&customUrl=${encodeURIComponent(currentRpcUrl)}`;
         } else if (cluster === "devnet") {
@@ -315,27 +315,25 @@ export function L2Bridge() {
                         <div className="flex gap-1">
                             <button
                                 onClick={() => handlePresetChange("devnet")}
-                                className={`px-2 py-0.5 rounded text-[11px] font-medium transition-all ${
-                                    selectedPreset === "devnet" && !isCustomRpc
-                                        ? "bg-blue-600 text-white"
-                                        : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
-                                }`}
+                                className={`px-2 py-0.5 rounded text-[11px] font-medium transition-all ${selectedPreset === "devnet" && !isCustomRpc
+                                    ? "bg-blue-600 text-white"
+                                    : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 cursor-pointer"
+                                    }`}
                             >
                                 Devnet
                             </button>
                             <button
                                 onClick={() => handlePresetChange("localhost")}
-                                className={`px-2 py-0.5 rounded text-[11px] font-medium transition-all ${
-                                    selectedPreset === "localhost" && !isCustomRpc
-                                        ? "bg-blue-600 text-white"
-                                        : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
-                                }`}
+                                className={`px-2 py-0.5 rounded text-[11px] font-medium transition-all ${selectedPreset === "localhost" && !isCustomRpc
+                                    ? "bg-blue-600 text-white"
+                                    : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 cursor-pointer"
+                                    }`}
                             >
                                 Local
                             </button>
                             <button
-                                disabled
-                                className="px-2 py-0.5 rounded text-[11px] font-medium bg-zinc-800/50 text-zinc-600 cursor-not-allowed"
+                                title="soon"
+                                className="px-2 py-0.5 rounded text-[11px] font-medium bg-zinc-800/50 text-zinc-600 cursor-pointer"
                             >
                                 Mainnet
                             </button>

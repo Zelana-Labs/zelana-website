@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import { MemoTest } from "@/components/dashboard/memotest";
 import { L2Bridge } from "@/components/dashboard/l2bridge";
+import { TransactionCreator } from "@/components/dashboard/transaction-creator-api";
 
 
 export default function RollupClientPage() {
@@ -197,15 +198,10 @@ export default function RollupClientPage() {
             <div className="slide-in-bottom delay-500 space-y-4">
               <div className="flex items-center gap-2">
                 <div className="w-1 h-4 bg-white/60 rounded-full" />
-                <h3 className="text-xs font-semibold text-white/60 uppercase tracking-widest">Single Transaction</h3>
+                <h3 className="text-xs font-semibold text-white/60 uppercase tracking-widest">Single Transaction with api</h3>
               </div>
               <div className="bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-white/5 p-6 hover:border-white/10 transition-all">
-                {/* <TransactionCreator
-                  walletConnected={!!user?.wallet?.address}
-                  walletAddress={user?.wallet?.address || ""}
-                  senderName={user?.email?.address || user?.wallet?.address || "User"}
-                  onWalletConnect={() => { }}
-                /> */}
+                <TransactionCreator />
               </div>
             </div>
           </div>

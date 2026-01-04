@@ -45,8 +45,8 @@ export function MemoTest() {
       setSentMemo(null);
       setError(null);
 
-      const rpc = createSolanaRpc("http://127.0.0.1:8899");
-      
+      const rpc = createSolanaRpc("https://api.devnet.solana.com");
+
       // Get latest blockhash with proper error handling
       const blockhashResponse = await rpc.getLatestBlockhash().send();
       const blockhash = blockhashResponse.value;
@@ -78,6 +78,7 @@ export function MemoTest() {
       const receipt = await signAndSendTransaction({
         wallet,
         transaction: transactionBuffer,
+        chain: "solana:devnet"
       });
 
       // Handle signature properly
@@ -92,10 +93,10 @@ export function MemoTest() {
       console.log("✅ Memo sent:", sig);
     } catch (err: unknown) {
       console.error("❌ Memo failed:", err);
-      
+
       // Better error handling
       const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
-      
+
       if (errorMessage.includes("simulation failed")) {
         setError("Transaction simulation failed. Your wallet may need SOL for devnet. Try requesting from a faucet.");
       } else if (errorMessage.includes("blockhash not found")) {
