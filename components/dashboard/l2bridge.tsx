@@ -380,8 +380,8 @@ export function L2Bridge() {
                             {/* Config */}
                             <div className="text-[10px] space-y-0.5">
                                 <div className="flex justify-between">
-                                    <span className="text-zinc-500">Cluster</span>
-                                    <span className="text-zinc-400 font-mono">{cluster}</span>
+                                    <span className="text-zinc-500">Program id</span>
+                                    <span className="text-[9px] text-zinc-400 font-mono">{BRIDGE_PROGRAM_ID}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-zinc-500">Domain</span>
