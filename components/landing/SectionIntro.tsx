@@ -20,9 +20,9 @@ export default function SectionIntro({ eyebrow, title, description, centered, cl
       transition={{ duration: 0.5 }}
       className={`${baseClass}${className ? ` ${className}` : ""}`}
     >
-      <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">{eyebrow}</p>
-      <h2 className="mt-3 text-3xl font-semibold text-zinc-900">{title}</h2>
-      <p className="mt-2 text-zinc-600">{description}</p>
+      <p className="text-xs uppercase tracking-[0.3em] text-zinc-400 font-medium">{eyebrow}</p>
+      <h2 className="mt-4 text-3xl md:text-4xl font-bold text-zinc-900">{title}</h2>
+      <p className="mt-3 text-lg text-zinc-600 leading-relaxed">{description}</p>
     </motion.div>
   );
 }
