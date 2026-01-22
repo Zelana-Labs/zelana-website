@@ -27,94 +27,98 @@ const solutions = [
   },
 ];
 
-// Nodes Creating Blocks Animation
+// Nodes Creating Blocks Animation - Exploded Rubik's Cube
 function BlockBuildingAnimation() {
-  // Isometric block with absolute positioning
-  const Block = ({ x, y, size = 40, delay = 0, animate = false }: { x: number; y: number; size?: number; delay?: number; animate?: boolean }) => {
-    const w = size;
-    const h = size * 0.6;
+  // Single small isometric cubelet
+  const Cube = ({ x, y, size = 12, delay = 0 }: { x: number; y: number; size?: number; delay?: number; floatDelay?: number }) => {
+    const s = size;
+    const halfW = s * 0.866;
+    const halfH = s * 0.5;
+    const height = s;
 
     const points = {
-      top: `${x},${y - h / 2} ${x + w / 2},${y - h} ${x + w},${y - h / 2} ${x + w / 2},${y}`,
-      left: `${x},${y - h / 2} ${x},${y + h / 2} ${x + w / 2},${y + h} ${x + w / 2},${y}`,
-      right: `${x + w / 2},${y} ${x + w / 2},${y + h} ${x + w},${y + h / 2} ${x + w},${y - h / 2}`,
+      top: `${x},${y - height} ${x + halfW},${y - height + halfH} ${x},${y - height + halfH * 2} ${x - halfW},${y - height + halfH}`,
+      left: `${x - halfW},${y - height + halfH} ${x},${y - height + halfH * 2} ${x},${y + halfH} ${x - halfW},${y}`,
+      right: `${x},${y - height + halfH * 2} ${x + halfW},${y - height + halfH} ${x + halfW},${y} ${x},${y + halfH}`,
     };
 
-    const content = (
+    return (
       <motion.g
-        initial={{ opacity: 0, y: -15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay, duration: 0.5 }}
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay, duration: 0.3 }}
       >
-        <polygon points={points.top} fill="#52525b" />
-        <polygon points={points.left} fill="#27272a" />
-        <polygon points={points.right} fill="#3f3f46" />
-        {/* Highlight on top */}
-        <polygon points={points.top} fill="url(#blockHighlight)" />
+        <polygon points={points.left} fill="#27272a" stroke="#1a1a1d" strokeWidth="0.8" />
+        <polygon points={points.right} fill="#3f3f46" stroke="#1a1a1d" strokeWidth="0.8" />
+        <polygon points={points.top} fill="#52525b" stroke="#1a1a1d" strokeWidth="0.8" />
+        {/* Highlight */}
+        <line x1={x} y1={y - height} x2={x - halfW} y2={y - height + halfH} stroke="white" strokeWidth="0.5" opacity="0.3" />
+        <line x1={x} y1={y - height} x2={x + halfW} y2={y - height + halfH} stroke="white" strokeWidth="0.3" opacity="0.2" />
       </motion.g>
     );
-
-    if (animate) {
-      return (
-        <motion.g
-          animate={{ y: [0, -4, 0] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-        >
-          {content}
-        </motion.g>
-      );
-    }
-
-    return content;
   };
+
+  // Single Rubik's cube with 3x3x3 cubelets with spacing
+  const cubeSize = 12;
+  const spacing = 5; // Gap between cubelets
+  const gridOffset = cubeSize + spacing;
+  const centerX = 140;
+  const centerY = 110;
+
+  // Create cube positions for exploded Rubik's cube
+  const cubes: { x: number; y: number; delay: number; floatDelay: number }[] = [];
+
+  for (let layer = 0; layer < 3; layer++) { // vertical layers (bottom to top)
+    for (let row = 0; row < 3; row++) { // depth
+      for (let col = 0; col < 3; col++) { // width
+        // Isometric positioning with spacing
+        const isoX = centerX + (col - row) * gridOffset * 0.866;
+        const isoY = centerY + (col + row) * gridOffset * 0.5 - layer * (cubeSize + spacing * 0.8);
+        cubes.push({
+          x: isoX,
+          y: isoY,
+          delay: 0.03 * (layer * 9 + row * 3 + col),
+          floatDelay: 0.1 * (layer * 3 + row + col), // Synchronized floating
+        });
+      }
+    }
+  }
 
   return (
     <div className="relative w-full h-full flex items-center justify-center p-4">
       <svg viewBox="0 0 280 220" className="w-full h-full max-w-[380px]">
-        <defs>
-          <linearGradient id="blockHighlight" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="white" stopOpacity="0.15" />
-            <stop offset="100%" stopColor="white" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-
-        {/* Base platform */}
-        <motion.polygon
-          points="140,170 70,135 140,100 210,135"
-          fill="#f4f4f5"
-          stroke="#e4e4e7"
-          strokeWidth="1.5"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-        />
-
-        {/* Block stack - positioned on the platform */}
-        {/* Bottom layer - 2 blocks */}
-        <Block x={110} y={130} size={36} delay={0.2} />
-        <Block x={134} y={145} size={36} delay={0.4} />
-
-        {/* Second layer */}
-        <Block x={122} y={115} size={36} delay={0.7} />
-
-        {/* Top block - floating */}
-        <Block x={122} y={93} size={36} delay={1} animate />
+        {/* Floating wrapper for entire Rubik's cube */}
+        <motion.g
+          animate={{ y: [0, -4, 0] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        >
+          {/* Render all 27 cubelets */}
+          {cubes.map((cube, i) => (
+            <Cube
+              key={i}
+              x={cube.x}
+              y={cube.y}
+              size={cubeSize}
+              delay={cube.delay}
+            />
+          ))}
+        </motion.g>
 
         {/* Transaction particles from left nodes */}
         {[0, 1, 2].map((i) => (
           <motion.circle
             key={`left-${i}`}
-            r="5"
+            r="3"
             fill="#18181b"
             initial={{ opacity: 0 }}
             animate={{
-              cx: [35 + i * 10, 140],
-              cy: [65 + i * 30, 120],
+              cx: [25, 140],
+              cy: [50 + i * 40, 100],
               opacity: [0, 1, 1, 0],
             }}
             transition={{
-              duration: 1.8,
-              delay: i * 0.6,
+              duration: 1.5,
+              delay: i * 0.5,
               repeat: Infinity,
               repeatDelay: 1,
               ease: "easeInOut"
@@ -126,17 +130,17 @@ function BlockBuildingAnimation() {
         {[0, 1, 2].map((i) => (
           <motion.circle
             key={`right-${i}`}
-            r="5"
+            r="3"
             fill="#18181b"
             initial={{ opacity: 0 }}
             animate={{
-              cx: [245 - i * 10, 140],
-              cy: [65 + i * 30, 120],
+              cx: [255, 140],
+              cy: [50 + i * 40, 100],
               opacity: [0, 1, 1, 0],
             }}
             transition={{
-              duration: 1.8,
-              delay: i * 0.6 + 0.3,
+              duration: 1.5,
+              delay: i * 0.5 + 0.25,
               repeat: Infinity,
               repeatDelay: 1,
               ease: "easeInOut"
@@ -146,52 +150,54 @@ function BlockBuildingAnimation() {
 
         {/* Left nodes */}
         {[
-          { x: 30, y: 55 },
-          { x: 40, y: 90 },
-          { x: 50, y: 125 },
+          { x: 22, y: 45 },
+          { x: 22, y: 90 },
+          { x: 22, y: 135 },
         ].map((pos, i) => (
           <motion.g key={`ln-${i}`}>
             <motion.circle
               cx={pos.x}
               cy={pos.y}
-              r="14"
+              r="12"
               fill="white"
               stroke="#d4d4d8"
               strokeWidth="2"
-              animate={{ scale: [1, 1.08, 1] }}
+              animate={{ scale: [1, 1.1, 1] }}
               transition={{ duration: 2, delay: i * 0.3, repeat: Infinity }}
             />
-            <circle cx={pos.x} cy={pos.y} r="5" fill="#18181b" />
+            <circle cx={pos.x} cy={pos.y} r="4" fill="#18181b" />
           </motion.g>
         ))}
 
         {/* Right nodes */}
         {[
-          { x: 250, y: 55 },
-          { x: 240, y: 90 },
-          { x: 230, y: 125 },
+          { x: 258, y: 45 },
+          { x: 258, y: 90 },
+          { x: 258, y: 135 },
         ].map((pos, i) => (
           <motion.g key={`rn-${i}`}>
             <motion.circle
               cx={pos.x}
               cy={pos.y}
-              r="14"
+              r="12"
               fill="white"
               stroke="#d4d4d8"
               strokeWidth="2"
-              animate={{ scale: [1, 1.08, 1] }}
+              animate={{ scale: [1, 1.1, 1] }}
               transition={{ duration: 2, delay: i * 0.3 + 0.15, repeat: Infinity }}
             />
-            <circle cx={pos.x} cy={pos.y} r="5" fill="#18181b" />
+            <circle cx={pos.x} cy={pos.y} r="4" fill="#18181b" />
           </motion.g>
         ))}
 
         {/* Connection lines (subtle) */}
-        <g opacity="0.2">
-          <line x1="45" y1="55" x2="110" y2="110" stroke="#71717a" strokeWidth="1" strokeDasharray="4 4" />
-          <line x1="55" y1="90" x2="110" y2="120" stroke="#71717a" strokeWidth="1" strokeDasharray="4 4" />
-          <line x1="235" y1="55" x2="170" y2="110" stroke="#71717a" strokeWidth="1" strokeDasharray="4 4" />
-          <line x1="225" y1="90" x2="170" y2="120" stroke="#71717a" strokeWidth="1" strokeDasharray="4 4" />
+        <g opacity="0.1">
+          <line x1="34" y1="45" x2="100" y2="90" stroke="#71717a" strokeWidth="1" strokeDasharray="3 3" />
+          <line x1="34" y1="90" x2="100" y2="100" stroke="#71717a" strokeWidth="1" strokeDasharray="3 3" />
+          <line x1="34" y1="135" x2="100" y2="115" stroke="#71717a" strokeWidth="1" strokeDasharray="3 3" />
+          <line x1="246" y1="45" x2="180" y2="90" stroke="#71717a" strokeWidth="1" strokeDasharray="3 3" />
+          <line x1="246" y1="90" x2="180" y2="100" stroke="#71717a" strokeWidth="1" strokeDasharray="3 3" />
+          <line x1="246" y1="135" x2="180" y2="115" stroke="#71717a" strokeWidth="1" strokeDasharray="3 3" />
         </g>
       </svg>
     </div>
