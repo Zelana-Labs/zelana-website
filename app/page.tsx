@@ -3,6 +3,7 @@
 import Hero from "@/components/landing/Hero";
 import Solutions from "@/components/landing/Solutions";
 import Principles from "@/components/landing/Principles";
+import SupportedBy from "@/components/landing/SupportedBy";
 import CTASection from "@/components/landing/CTASection";
 import Footer from "@/components/landing/Footer";
 import Navbar from "@/components/ui/Navbar";
@@ -12,8 +13,9 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white text-zinc-900 overflow-x-clip">
       <GradientBG />
       <Navbar />
-      <main className="relative z-10 space-y-24 md:space-y-32 pb-32">
+      <main className="relative z-10 space-y-16 md:space-y-20 pb-24">
         <Hero />
+        <SupportedBy />
         <Solutions />
         <Principles />
         <CTASection />

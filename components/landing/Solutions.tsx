@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionValueEvent, MotionValue } from "framer-motion";
 import { Blocks, Shield, FileCheck, ArrowRightLeft } from "lucide-react";
 
 const solutions = [
@@ -549,13 +549,31 @@ const animations = [
   BridgeAnimation,
 ];
 
+// Progress line component to fix hooks rules
+function ProgressLine({ index, scrollYProgress }: { index: number; scrollYProgress: MotionValue<number> }) {
+  const height = useTransform(
+    scrollYProgress,
+    [index / solutions.length, (index + 1) / solutions.length],
+    ["0%", "100%"]
+  );
+
+  return (
+    <div className="w-0.5 h-10 lg:h-16 bg-zinc-200 mx-auto mt-2 overflow-hidden">
+      <motion.div
+        className="w-full bg-zinc-900"
+        style={{ height }}
+      />
+    </div>
+  );
+}
+
 // Individual solution content with scroll-linked opacity
 function SolutionContent({
   index,
   scrollYProgress
 }: {
   index: number;
-  scrollYProgress: any;
+  scrollYProgress: MotionValue<number>;
 }) {
   const solution = solutions[index];
   const total = solutions.length;
@@ -615,7 +633,7 @@ function SolutionAnimation({
   scrollYProgress
 }: {
   index: number;
-  scrollYProgress: any;
+  scrollYProgress: MotionValue<number>;
 }) {
   const Animation = animations[index];
   const Icon = solutions[index].icon;
@@ -733,18 +751,7 @@ export default function Solutions() {
                         transition={{ duration: 0.3 }}
                       />
                       {i < solutions.length - 1 && (
-                        <div className="w-0.5 h-10 lg:h-16 bg-zinc-200 mx-auto mt-2 overflow-hidden">
-                          <motion.div
-                            className="w-full bg-zinc-900"
-                            style={{
-                              height: useTransform(
-                                scrollYProgress,
-                                [i / solutions.length, (i + 1) / solutions.length],
-                                ["0%", "100%"]
-                              )
-                            }}
-                          />
-                        </div>
+                        <ProgressLine index={i} scrollYProgress={scrollYProgress} />
                       )}
                     </motion.div>
                   ))}
