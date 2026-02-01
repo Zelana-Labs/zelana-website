@@ -157,6 +157,7 @@ export function StatusBadge({ status, size = 'sm' }: StatusBadgeProps) {
     healthy: { color: 'bg-emerald-400/20 text-emerald-400', label: 'Healthy' },
     degraded: { color: 'bg-yellow-400/20 text-yellow-400', label: 'Degraded' },
     unhealthy: { color: 'bg-red-400/20 text-red-400', label: 'Unhealthy' },
+    offline: { color: 'bg-zinc-400/20 text-zinc-400', label: 'Offline' },
   };
   const normalizedType = status?.toLowerCase();
   const config = statusConfig[normalizedType] || { color: 'bg-white/20 text-white/60', label: status };
@@ -355,7 +356,7 @@ export function AmountDisplay({ amount, showSign = false, className = '' }: Amou
 
   return (
     <span className={`font-mono ${color} ${className}`}>
-      {sign}{sol.toFixed(4)} SOL
+      {sign}{sol.toFixed(4)} zeSOL
     </span>
   );
 }

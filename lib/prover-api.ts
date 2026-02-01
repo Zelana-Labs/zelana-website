@@ -143,25 +143,49 @@ class ProverApiClient {
 
   /**
    * Check prover health (Core API v2).
+   * Also fetches worker counts from /workers endpoint for accuracy.
    */
   async getHealth(): Promise<ProverHealth> {
     try {
-      const response = await this.get<{
-        status: string;
+      // API returns { status: "success", data: { ... } }
+      interface HealthData {
+        status?: string;
+        active_jobs?: number;
+        cached_proofs?: number;
+        max_concurrent_jobs?: number;
+        mock_prover?: boolean;
         worker_count?: number;
         workers_ready?: number;
-        pending_jobs?: number;
-        total_proofs?: number;
-        mock_prover?: boolean;
-      }>('/v2/health');
+      }
+      
+      // Fetch both health and workers in parallel
+      const [healthResponse, workersResponse] = await Promise.all([
+        this.get<{ status: string; data?: HealthData }>('/v2/health'),
+        this.get<{ status: string; data?: { workers: Worker[]; total: number; ready: number }; workers?: Worker[] }>('/workers').catch(() => null),
+      ]);
+
+      // Unwrap health data
+      const data: HealthData = healthResponse.data || {};
+      
+      // Get worker counts from workers endpoint (more accurate)
+      let workerCount = data.max_concurrent_jobs || data.worker_count || 0;
+      let workersReady = data.workers_ready || 0;
+      
+      if (workersResponse?.data) {
+        workerCount = workersResponse.data.total;
+        workersReady = workersResponse.data.ready;
+      } else if (workersResponse?.workers) {
+        workerCount = workersResponse.workers.length;
+        workersReady = workersResponse.workers.filter(w => w.ready).length;
+      }
 
       return {
-        status: response.status === 'healthy' ? 'healthy' : 'unhealthy',
-        worker_count: response.worker_count || 0,
-        workers_ready: response.workers_ready || 0,
-        pending_jobs: response.pending_jobs || 0,
-        total_proofs: response.total_proofs || 0,
-        mock_prover: response.mock_prover || false,
+        status: (data.status === 'ok' || healthResponse.status === 'success') ? 'healthy' : 'unhealthy',
+        worker_count: workerCount,
+        workers_ready: workersReady,
+        pending_jobs: data.active_jobs || 0,
+        total_proofs: data.cached_proofs || 0,
+        mock_prover: data.mock_prover || false,
       };
     } catch {
       return {
@@ -182,16 +206,24 @@ class ProverApiClient {
     try {
       const response = await this.get<{
         status: string;
+        data?: {
+          status?: string;
+          pending_batches?: number;
+          total_batches?: number;
+        };
         pending_batches?: number;
         total_batches?: number;
       }>('/health');
 
+      // Unwrap data if present
+      const data = response.data || response;
+
       return {
-        status: response.status === 'ok' ? 'healthy' : 'unhealthy',
+        status: (data.status === 'ok' || response.status === 'success') ? 'healthy' : 'unhealthy',
         worker_count: 0,
         workers_ready: 0,
-        pending_jobs: response.pending_batches || 0,
-        total_proofs: response.total_batches || 0,
+        pending_jobs: data.pending_batches || 0,
+        total_proofs: data.total_batches || 0,
         mock_prover: false,
       };
     } catch {
@@ -215,7 +247,18 @@ class ProverApiClient {
    */
   async getWorkers(): Promise<Worker[]> {
     try {
-      const response = await this.get<{ workers: Worker[] }>('/workers');
+      // API returns { status: "success", data: { workers: [...], total: N, ready: N } }
+      const response = await this.get<{
+        status: string;
+        data?: { workers: Worker[]; total: number; ready: number };
+        // Also handle direct format (without wrapper)
+        workers?: Worker[];
+      }>('/workers');
+      
+      // Unwrap data if present
+      if (response.data?.workers) {
+        return response.data.workers;
+      }
       return response.workers || [];
     } catch {
       return [];

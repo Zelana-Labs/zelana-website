@@ -316,6 +316,9 @@ export function ShieldedTransfer() {
         ciphertext: encrypted.ciphertext,
         ephemeralKey: encrypted.ephemeralPk,
         nonce: encrypted.nonce, // Add nonce to request
+        // Shield hints: debit transparent account
+        shieldFrom: hexToBytes32(l2Address!.toString()),
+        shieldAmount: amountLamports,
       };
       
       // Submit shielded transaction
@@ -620,6 +623,9 @@ export function ShieldedTransfer() {
           ciphertext: burnEncrypted.ciphertext,
           ephemeralKey: burnEncrypted.ephemeralPk,
           nonce: burnEncrypted.nonce,
+          // Unshield hints: credit transparent account
+          unshieldTo: hexToBytes32(l2Address!.toString()),
+          unshieldAmount: inputNote.value,
         };
         
         const response = await client.apiClient.submitShielded(request);
@@ -968,7 +974,7 @@ export function ShieldedTransfer() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <div className="text-[10px] text-white/50">
-            <span className="font-medium text-blue-400/80">Demo Mode:</span> Shield/Unshield operations use mock proofs. 
+            <span className="font-medium text-blue-400/80"> Mode: </span> 
             In production, full ZK proofs will be generated and verified.
           </div>
         </div>

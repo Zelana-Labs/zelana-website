@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Connection, PublicKey } from "@solana/web3.js";
 import BN from "bn.js";
+import DarkNavbar from "@/components/ui/DarkNavbar";
 import { useProverHealth, useBatches } from "@/hooks/useZelanaData";
 import { config, getExplorerUrl } from "@/lib/config";
 import {
@@ -628,9 +629,10 @@ export default function ProofsPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
+      <DarkNavbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-8 slide-in-top">
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-2xl font-semibold text-white">ZK Proofs</h1>
             {health && (
@@ -648,7 +650,7 @@ export default function ProofsPage() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-6 slide-in-top delay-100">
           <button
             onClick={() => setActiveTab('prover')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -674,9 +676,20 @@ export default function ProofsPage() {
         </div>
 
         {/* Tab Content */}
-        {activeTab === 'prover' && <ProverStatusTab />}
-        {activeTab === 'onchain' && <OnChainProofsTab />}
+        <div className="slide-in-bottom delay-200">
+          {activeTab === 'prover' && <ProverStatusTab />}
+          {activeTab === 'onchain' && <OnChainProofsTab />}
+        </div>
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-white/5 mt-20">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+          <div className="text-xs text-white/30 text-center uppercase tracking-widest">
+            Privacy-focused zkSVM on Solana
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

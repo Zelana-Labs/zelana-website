@@ -20,7 +20,7 @@
         "@solana/web3.js": "^1.98.4",
         "@vercel/analytics": "^1.6.1",
         "@zelana/react": "^0.1.1",
-        "@zelana/sdk": "^0.1.5",
+        "@zelana/sdk": "^0.1.6",
         "bn.js": "^5.2.2",
         "clsx": "^2.1.1",
         "framer-motion": "^12.23.22",
@@ -887,7 +887,7 @@
 
     "@zelana/react": ["@zelana/react@0.1.1", "", { "dependencies": { "@zelana/sdk": "^0.1.0" }, "peerDependencies": { "@types/react": ">=18", "@types/react-dom": ">=18", "react": ">=18", "react-dom": ">=18" } }, "sha512-T+rsZJFgES7pl4LYSTUdS6dComujYZjMDkuYgU8SbVShpgM4m5U6SzIGn+8BDq+CnY+1sHdWCUpW+T+/+cnH0Q=="],
 
-    "@zelana/sdk": ["@zelana/sdk@0.1.5", "", { "dependencies": { "@noble/ciphers": "^2.1.1", "@noble/curves": "^2.0.1", "@noble/ed25519": "^2.1.0", "@noble/hashes": "^1.4.0" } }, "sha512-gnAhB5koNxWzVXOc/5b5VWnYUqhZsH6jwRISo/P0Bsg9d8z7ORQy060s4ZSMYwM/NhjZwVvydwRT6yjIc7pxmg=="],
+    "@zelana/sdk": ["@zelana/sdk@0.1.6", "", { "dependencies": { "@noble/ciphers": "^2.1.1", "@noble/curves": "^2.0.1", "@noble/ed25519": "^2.1.0", "@noble/hashes": "^1.4.0" } }, "sha512-MSrHE2jMpfMv5ZoaKk5dgBELeJINdVmBCB2wSWeY1dtK2VwFQchhC6okn6/GpFFJ2chPfFBEozX3kb7eJvZjbQ=="],
 
     "abitype": ["abitype@1.2.3", "", { "peerDependencies": { "typescript": ">=5.0.4", "zod": "^3.22.0 || ^4.0.0" } }, "sha512-Ofer5QUnuUdTFsBRwARMoWKOH1ND5ehwYhJ3OJ/BQO+StkwQjHw0XyVh4vDttzHB7QOFhPHa/o413PJ82gU/Tg=="],
 

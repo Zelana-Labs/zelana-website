@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import DarkNavbar from '@/components/ui/DarkNavbar';
 import { useSequencerStats, useConnectionStatus, useBatches, useSearch } from '@/hooks/useZelanaData';
 import { 
   StatCard, 
@@ -225,20 +226,21 @@ export default function ExplorerPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
+      <DarkNavbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-8 slide-in-top">
           <h1 className="text-2xl font-semibold text-white mb-2">Zelana Explorer</h1>
           <p className="text-white/60">Explore transactions, batches, and accounts on the Zelana L2</p>
         </div>
 
         {/* Search Bar */}
-        <div className="mb-8">
+        <div className="mb-8 slide-in-top delay-100">
           <SearchBar />
         </div>
 
         {/* Stats Grid - User-focused metrics */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 slide-in-bottom delay-200">
           {statsLoading ? (
             <>
               <Skeleton className="h-24" />
@@ -278,7 +280,7 @@ export default function ExplorerPage() {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 slide-in-bottom delay-300">
           {/* Recent Batches */}
           <div className="lg:col-span-2 bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-white/5 p-6">
             <div className="flex items-center justify-between mb-4">
@@ -357,6 +359,15 @@ export default function ExplorerPage() {
           </div>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-white/5 mt-20">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+          <div className="text-xs text-white/30 text-center uppercase tracking-widest">
+            Privacy-focused zkSVM on Solana
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

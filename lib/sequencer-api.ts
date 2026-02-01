@@ -19,7 +19,7 @@ export interface PaginatedResponse<T> {
 }
 
 export interface SequencerHealth {
-  status: 'healthy' | 'degraded' | 'unhealthy';
+  status: 'healthy' | 'degraded' | 'unhealthy' | 'offline';
   version?: string;
   uptime_secs?: number;
 }
@@ -222,12 +222,26 @@ class SequencerApiClient {
    */
   async getHealth(): Promise<SequencerHealth> {
     try {
-      const response = await this.get<{ status: string }>('/health');
+      const response = await this.get<{ 
+        status?: string; 
+        healthy?: boolean;
+        version?: string;
+        uptime_secs?: number;
+      }>('/health');
+      
+      // Handle both response formats:
+      // - New format: { healthy: true, version: "...", uptime_secs: ... }
+      // - Legacy format: { status: "ok" }
+      const isHealthy = response.healthy === true || response.status === 'ok';
+      
       return {
-        status: response.status === 'ok' ? 'healthy' : 'unhealthy',
+        status: isHealthy ? 'healthy' : 'unhealthy',
+        version: response.version,
+        uptime_secs: response.uptime_secs,
       };
     } catch {
-      return { status: 'unhealthy' };
+      // Return 'offline' when we can't reach the server (network error)
+      return { status: 'offline' };
     }
   }
 

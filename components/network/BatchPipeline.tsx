@@ -82,13 +82,18 @@ export function CurrentBatchStatus() {
     );
   }
 
-  // Calculate time since batch started
-  const now = Date.now();
-  const startedAt = batchStatus.started_at > 1e12 ? batchStatus.started_at : batchStatus.started_at * 1000;
-  const elapsedSecs = Math.floor((now - startedAt) / 1000);
-  const elapsedStr = elapsedSecs < 60 
-    ? `${elapsedSecs}s` 
-    : `${Math.floor(elapsedSecs / 60)}m ${elapsedSecs % 60}s`;
+  // Calculate time since batch started (handle missing/invalid values)
+  let elapsedStr = '-';
+  if (batchStatus.started_at && batchStatus.started_at > 0) {
+    const now = Date.now();
+    const startedAt = batchStatus.started_at > 1e12 ? batchStatus.started_at : batchStatus.started_at * 1000;
+    const elapsedSecs = Math.floor((now - startedAt) / 1000);
+    if (elapsedSecs >= 0 && isFinite(elapsedSecs)) {
+      elapsedStr = elapsedSecs < 60 
+        ? `${elapsedSecs}s` 
+        : `${Math.floor(elapsedSecs / 60)}m ${elapsedSecs % 60}s`;
+    }
+  }
 
   return (
     <div className="bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-emerald-500/20 p-6">
@@ -102,11 +107,11 @@ export function CurrentBatchStatus() {
 
       <div className="grid grid-cols-3 gap-4">
         <div className="text-center">
-          <div className="text-2xl font-bold text-white">#{batchStatus.current_batch_id}</div>
+          <div className="text-2xl font-bold text-white">#{batchStatus.current_batch_id ?? '-'}</div>
           <div className="text-xs text-white/40 mt-1">Batch ID</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-emerald-400">{batchStatus.tx_count}</div>
+          <div className="text-2xl font-bold text-emerald-400">{batchStatus.tx_count ?? 0}</div>
           <div className="text-xs text-white/40 mt-1">Transactions</div>
         </div>
         <div className="text-center">

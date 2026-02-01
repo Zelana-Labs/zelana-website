@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import DarkNavbar from '@/components/ui/DarkNavbar';
 import { useProverHealth, useProverWorkers, useSequencerHealth } from '@/hooks/useZelanaData';
 import { 
   StatCard, 
@@ -14,6 +15,7 @@ import {
   RecentBatches,
   SettlementStats,
 } from '@/components/network/BatchPipeline';
+import { LiveProvingStatus } from '@/components/network/LiveProvingStatus';
 
 // Icons
 function CpuIcon() {
@@ -162,9 +164,10 @@ export default function NetworkPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
+      <DarkNavbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-8 slide-in-top">
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-2xl font-semibold text-white">Network Status</h1>
             {sequencerHealth && (
@@ -177,7 +180,7 @@ export default function NetworkPage() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-6 slide-in-top delay-100">
           <button
             onClick={() => setActiveTab('batches')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -209,7 +212,7 @@ export default function NetworkPage() {
 
         {/* Batch Pipeline Tab */}
         {activeTab === 'batches' && (
-          <div className="space-y-6">
+          <div className="space-y-6 slide-in-bottom delay-200">
             {/* Current Batch + Stats */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <CurrentBatchStatus />
@@ -267,6 +270,11 @@ export default function NetworkPage() {
                   />
                 </>
               )}
+            </div>
+
+            {/* Live Proving Status */}
+            <div className="mb-6">
+              <LiveProvingStatus />
             </div>
 
             {/* Main Content */}
@@ -383,6 +391,15 @@ export default function NetworkPage() {
           </>
         )}
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-white/5 mt-20">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+          <div className="text-xs text-white/30 text-center uppercase tracking-widest">
+            Privacy-focused zkSVM on Solana
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

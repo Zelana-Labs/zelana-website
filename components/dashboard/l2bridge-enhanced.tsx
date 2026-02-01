@@ -615,8 +615,8 @@ export function L2BridgeEnhanced() {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                     <div className="text-[10px] text-blue-400/80">
-                                        <span className="font-medium">Demo Mode:</span> Withdrawals appear instantly. 
-                                        In production, settlement takes ~15 minutes for ZK proof generation and L1 finality.
+                                        <span className="font-medium">Mode:</span> Withdrawals appear instantly. 
+                                        currently, settlement takes ~20-40 secs for ZK proof generation and L1 finality.
                                     </div>
                                 </div>
                             </div>

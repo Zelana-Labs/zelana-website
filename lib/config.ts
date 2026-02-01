@@ -49,8 +49,8 @@ export function getConfig(): ZelanaConfig {
     // Solana RPC - defaults based on network
     solanaRpc: process.env.NEXT_PUBLIC_SOLANA_RPC || getSolanaRpcForNetwork(network),
     
-    // Sequencer URLs
-    sequencerUrl: process.env.NEXT_PUBLIC_SEQUENCER_URL || 'http://localhost:3001',
+    // Sequencer URLs (support both SEQUENCER_URL and ROLLUP_URL for backwards compatibility)
+    sequencerUrl: process.env.NEXT_PUBLIC_SEQUENCER_URL || process.env.NEXT_PUBLIC_ROLLUP_URL || 'http://localhost:3001',
     sequencerWsUrl: process.env.NEXT_PUBLIC_SEQUENCER_WS_URL || 'ws://localhost:3001/ws',
     
     // Prover URL
