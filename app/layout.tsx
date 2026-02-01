@@ -1,7 +1,8 @@
 import './globals.css'
 import { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/next'
-import Providers from '@/components/Providers' // You'll need to create this
+import Providers from '@/components/Providers'
+import ClientLayout from '@/components/ClientLayout'
 
 export const metadata: Metadata = {
   title: 'Zelana - Privacy focused ZK rollup',
@@ -58,7 +59,7 @@ export default function RootLayout({
     "url": "https://zelana.org",
   };
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         <script
           type="application/ld+json"
@@ -69,9 +70,11 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
       </head>
-      <body>
+      <body className="bg-white text-zinc-900 antialiased">
         <Providers>
-          {children}
+          <ClientLayout>
+            {children}
+          </ClientLayout>
         </Providers>
         <Analytics />
       </body>

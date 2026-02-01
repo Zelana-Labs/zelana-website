@@ -1,9 +1,9 @@
 // components/Providers.tsx
 'use client'
-
-import { PrivyProvider } from '@privy-io/react-auth'
+import { PrivyProvider } from "@privy-io/react-auth";
 import { toSolanaWalletConnectors } from '@privy-io/react-auth/solana'
 import { createSolanaRpc, createSolanaRpcSubscriptions } from '@solana/kit'
+import { L2WalletProvider } from '@/contexts/L2WalletContext';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -48,7 +48,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         }
       }}
     >
-      {children}
+      <L2WalletProvider>
+        {children}
+      </L2WalletProvider>
     </PrivyProvider>
   )
 }

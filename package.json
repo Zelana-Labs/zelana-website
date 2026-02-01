@@ -4,13 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "@aztec/bb.js": "0.82.2",
     "@noble/ed25519": "^3.0.0",
     "@noble/hashes": "^2.0.1",
+    "@noir-lang/noir_js": "1.0.0-beta.18",
+    "@noir-lang/types": "1.0.0-beta.18",
     "@privy-io/react-auth": "^3.10.0",
     "@solana-program/memo": "^0.10.0",
     "@solana-program/system": "^0.10.0",
@@ -21,6 +24,8 @@
     "@solana/wallet-adapter-wallets": "^0.19.32",
     "@solana/web3.js": "^1.98.4",
     "@vercel/analytics": "^1.6.1",
+    "@zelana/react": "^0.1.1",
+    "@zelana/sdk": "^0.1.5",
     "bn.js": "^5.2.2",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.22",
@@ -35,12 +40,13 @@
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/bn.js": "^5.2.0",
+    "@types/bs58": "^4.0.4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "15.5.0",
+    "eslint-config-next": "15.5.9",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5.3.0"
   }
 }

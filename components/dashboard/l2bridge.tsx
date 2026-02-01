@@ -20,9 +20,9 @@ import { PublicKey, Connection, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import bs58 from "bs58";
 
 // Bridge configuration
-const BRIDGE_PROGRAM_ID = "9HXapBN9otLGnQNGv1HRk91DGqMNvMAvQqohL7gPW1sd";
+const BRIDGE_PROGRAM_ID = "8SE6gCijcFQixvDQqWu29mCm9AydN8hcwWh2e2Q6RQgE";
 const SYSTEM_PROGRAM_ID = address("11111111111111111111111111111111");
-const DOMAIN = "solana";
+const DOMAIN = "zelana";
 const MIN_BALANCE_SOL = 2;
 
 // Preset RPC endpoints
@@ -69,7 +69,8 @@ function WalletBalance({ walletAddress, connection }: WalletBalanceProps) {
         };
 
         fetchBalance();
-        const interval = setInterval(fetchBalance, 10000);
+        // Poll every 60 seconds to avoid RPC rate limiting
+        const interval = setInterval(fetchBalance, 60000);
         return () => clearInterval(interval);
     }, [walletAddress, connection]);
 
@@ -87,7 +88,6 @@ export function L2Bridge() {
     const wallet = wallets[0];
 
     const [selectedPreset, setSelectedPreset] = useState<keyof typeof RPC_PRESETS>("devnet");
-    const [customRpcUrl, setCustomRpcUrl] = useState("");
     const [isCustomRpc, setIsCustomRpc] = useState(false);
     const [amount, setAmount] = useState("1.0");
     const [nonce, setNonce] = useState("101");
@@ -99,7 +99,7 @@ export function L2Bridge() {
     } | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    const currentRpcUrl = isCustomRpc ? customRpcUrl : RPC_PRESETS[selectedPreset];
+    const currentRpcUrl = RPC_PRESETS[selectedPreset];
 
     const connection = useMemo(
         () => new Connection(currentRpcUrl, "confirmed"),
@@ -118,17 +118,6 @@ export function L2Bridge() {
     };
 
     const cluster = getCluster();
-
-    const getChainId = (): string => {
-        if (currentRpcUrl.includes("127.0.0.1") || currentRpcUrl.includes("localhost")) {
-            return "solana:localnet";
-        } else if (currentRpcUrl.includes("devnet")) {
-            return "solana:devnet";
-        } else if (currentRpcUrl.includes("mainnet")) {
-            return "solana:mainnet";
-        }
-        return "solana:devnet";
-    };
 
     const handlePresetChange = (preset: keyof typeof RPC_PRESETS) => {
         if (preset === "mainnet") return;
@@ -181,7 +170,7 @@ export function L2Bridge() {
             setDepositDetails(null);
             setError(null);
 
-            const rpc = createSolanaRpc(currentRpcUrl);
+            const rpc = createSolanaRpc("https://api.devnet.solana.com");
             const blockhashResponse = await rpc.getLatestBlockhash().send();
             const blockhash = blockhashResponse.value;
 
@@ -225,11 +214,11 @@ export function L2Bridge() {
             const depositInstruction = {
                 programAddress: address(BRIDGE_PROGRAM_ID),
                 accounts: [
-                    { address: walletAddress, role: 3 },
-                    { address: address(configPda.toBase58()), role: 0 },
-                    { address: address(vaultPda.toBase58()), role: 1 },
-                    { address: address(receiptPda.toBase58()), role: 1 },
-                    { address: SYSTEM_PROGRAM_ID, role: 0 },
+                    { address: walletAddress, role: 3 },                  // Depositor: Signer + Writable
+                    { address: address(configPda.toBase58()), role: 0 },  // Config: ReadOnly (Matching Rust Script)
+                    { address: address(vaultPda.toBase58()), role: 1 },   // Vault: Writable
+                    { address: address(receiptPda.toBase58()), role: 1 }, // Receipt: Writable
+                    { address: SYSTEM_PROGRAM_ID, role: 0 },              // System: ReadOnly
                 ],
                 data: instructionData,
             };
@@ -245,12 +234,13 @@ export function L2Bridge() {
             const base64Tx = getBase64EncodedWireTransaction(compiledTransaction);
             const transactionBuffer = Buffer.from(base64Tx, "base64");
 
-            const chainId = getChainId();
+            console.log("Transaction Buffer: ", transactionBuffer);
+            console.log("Wallet: ", wallet);
 
             const receipt = await signAndSendTransaction({
                 wallet,
                 transaction: transactionBuffer,
-                chain: chainId,
+                chain: "solana:devnet",
             });
 
             const sig =

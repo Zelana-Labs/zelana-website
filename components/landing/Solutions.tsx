@@ -166,6 +166,7 @@ function BlockBuildingAnimation() {
       isMounted = false;
       timeouts.forEach(t => clearTimeout(t));
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cycleKey]);
 
 
@@ -549,8 +550,14 @@ const animations = [
   BridgeAnimation,
 ];
 
-// Progress line component to fix hooks rules
-function ProgressLine({ index, scrollYProgress }: { index: number; scrollYProgress: MotionValue<number> }) {
+// Progress line component for scroll-linked height
+function ProgressLine({
+  index,
+  scrollYProgress
+}: {
+  index: number;
+  scrollYProgress: MotionValue<number>;
+}) {
   const height = useTransform(
     scrollYProgress,
     [index / solutions.length, (index + 1) / solutions.length],
