@@ -6,6 +6,7 @@
  */
 
 import { config } from './config';
+import { safeFetch } from './safe-fetch';
 
 
 // Types
@@ -181,7 +182,7 @@ class SequencerApiClient {
    * Make a GET request to the sequencer.
    */
   private async get<T>(endpoint: string): Promise<T> {
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+    const response = await safeFetch(`${this.baseUrl}${endpoint}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -200,7 +201,7 @@ class SequencerApiClient {
    * Make a POST request to the sequencer.
    */
   private async post<T>(endpoint: string, body?: unknown): Promise<T> {
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+    const response = await safeFetch(`${this.baseUrl}${endpoint}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import DarkNavbar from '@/components/ui/DarkNavbar';
 import { useProverHealth, useProverWorkers, useSequencerHealth } from '@/hooks/useZelanaData';
 import { 
@@ -16,6 +17,7 @@ import {
   SettlementStats,
 } from '@/components/network/BatchPipeline';
 import { LiveProvingStatus } from '@/components/network/LiveProvingStatus';
+import { isDemoMode } from '@/lib/demo-mode';
 
 // Icons
 function CpuIcon() {
@@ -157,10 +159,29 @@ type Tab = 'batches' | 'prover';
 
 // Main Network Page
 export default function NetworkPage() {
+  const router = useRouter();
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('batches');
   const { data: health, isLoading: healthLoading } = useProverHealth();
   const { data: workers, isLoading: workersLoading } = useProverWorkers();
   const { data: sequencerHealth } = useSequencerHealth();
+
+  // Redirect to demo page in production
+  useEffect(() => {
+    if (isDemoMode()) {
+      setIsRedirecting(true);
+      router.push('/demo');
+    }
+  }, [router]);
+
+  // Show loading state while redirecting
+  if (isRedirecting) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="text-white/60 text-sm">Redirecting...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">

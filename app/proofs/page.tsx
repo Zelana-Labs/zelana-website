@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Connection, PublicKey } from "@solana/web3.js";
 import BN from "bn.js";
 import DarkNavbar from "@/components/ui/DarkNavbar";
@@ -13,6 +14,7 @@ import {
   HashDisplay,
   TimeDisplay,
 } from "@/components/explorer/ExplorerUI";
+import { isDemoMode } from "@/lib/demo-mode";
 
 // =============================================================================
 // Types
@@ -624,8 +626,27 @@ function OnChainProofsTab() {
 // =============================================================================
 
 export default function ProofsPage() {
+  const router = useRouter();
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('prover');
   const { data: health } = useProverHealth();
+
+  // Redirect to demo page in production
+  useEffect(() => {
+    if (isDemoMode()) {
+      setIsRedirecting(true);
+      router.push('/demo');
+    }
+  }, [router]);
+
+  // Show loading state while redirecting
+  if (isRedirecting) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="text-white/60 text-sm">Redirecting...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { isDemoMode } from '@/lib/demo-mode';
 import { useAccount } from '@/hooks/useZelanaData';
 import { sequencerApi } from '@/lib/sequencer-api';
 import { 
@@ -224,6 +225,24 @@ function LoadingFallback() {
 }
 
 export default function AccountsPage() {
+  const router = useRouter();
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  useEffect(() => {
+    if (isDemoMode()) {
+      setIsRedirecting(true);
+      router.push('/demo');
+    }
+  }, [router]);
+
+  if (isRedirecting) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="text-white/60 text-sm">Redirecting...</div>
+      </div>
+    );
+  }
+
   return (
     <Suspense fallback={<LoadingFallback />}>
       <AccountsPageContent />

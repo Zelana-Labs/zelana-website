@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { isDemoMode } from '@/lib/demo-mode';
 import { useSequencerStats } from '@/hooks/useZelanaData';
 import { 
   Skeleton, 
@@ -196,7 +198,24 @@ function EncryptedNotesTab() {
 }
 
 export default function ShieldedPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<ShieldedTab>('overview');
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  useEffect(() => {
+    if (isDemoMode()) {
+      setIsRedirecting(true);
+      router.push('/demo');
+    }
+  }, [router]);
+
+  if (isRedirecting) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="text-white/60 text-sm">Redirecting...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">

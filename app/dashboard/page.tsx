@@ -1,19 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
 import { L2BridgeEnhanced } from "@/components/dashboard/l2bridge-enhanced";
 import { BatchTransfer } from "@/components/dashboard/batch-transfer";
 import { ShieldedTransfer } from "@/components/dashboard/shielded-transfer";
 import { TransactionHistory } from "@/components/dashboard/transaction-history";
 import { useL2Wallet } from "@/contexts/L2WalletContext";
+import { isDemoMode } from "@/lib/demo-mode";
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [showUserInfo, setShowUserInfo] = useState(false);
   const [activeTab, setActiveTab] = useState<'bridge' | 'transfer' | 'shielded' | 'history'>('bridge');
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const { user, logout, authenticated, login } = usePrivy();
   const { isReady, l2Address, error: l2Error } = useL2Wallet();
+
+  // Redirect to demo page in production
+  useEffect(() => {
+    if (isDemoMode()) {
+      setIsRedirecting(true);
+      router.push('/demo');
+    }
+  }, [router]);
+
+  // Show loading state while redirecting
+  if (isRedirecting) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="text-white/60 text-sm">Redirecting...</div>
+      </div>
+    );
+  }
 
   // Login screen
   if (!authenticated) {

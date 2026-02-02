@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import DarkNavbar from '@/components/ui/DarkNavbar';
 import { useSequencerStats, useConnectionStatus, useBatches, useSearch } from '@/hooks/useZelanaData';
@@ -14,6 +15,7 @@ import {
   TimeDisplay,
   AmountDisplay,
 } from '@/components/explorer/ExplorerUI';
+import { isDemoMode } from '@/lib/demo-mode';
 
 // Icons
 function UsersIcon() {
@@ -221,8 +223,27 @@ function RecentBatches() {
 
 // Main Explorer Page
 export default function ExplorerPage() {
+  const router = useRouter();
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const { data: stats, isLoading: statsLoading } = useSequencerStats();
   const connectionStatus = useConnectionStatus();
+
+  // Redirect to demo page in production
+  useEffect(() => {
+    if (isDemoMode()) {
+      setIsRedirecting(true);
+      router.push('/demo');
+    }
+  }, [router]);
+
+  // Show loading state while redirecting
+  if (isRedirecting) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <div className="text-white/60 text-sm">Redirecting...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">

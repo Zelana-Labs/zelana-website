@@ -6,6 +6,7 @@
  */
 
 import { config } from './config';
+import { safeFetch } from './safe-fetch';
 
 // =============================================================================
 // Types
@@ -102,7 +103,7 @@ class ProverApiClient {
    * Make a GET request to the prover.
    */
   private async get<T>(endpoint: string): Promise<T> {
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+    const response = await safeFetch(`${this.baseUrl}${endpoint}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -121,7 +122,7 @@ class ProverApiClient {
    * Make a POST request to the prover.
    */
   private async post<T>(endpoint: string, body?: unknown): Promise<T> {
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+    const response = await safeFetch(`${this.baseUrl}${endpoint}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -303,7 +304,7 @@ class ProverApiClient {
    */
   async cancelJob(jobId: string): Promise<boolean> {
     try {
-      await fetch(`${this.baseUrl}/v2/batch/${jobId}`, { method: 'DELETE' });
+      await safeFetch(`${this.baseUrl}/v2/batch/${jobId}`, { method: 'DELETE' });
       return true;
     } catch {
       return false;
