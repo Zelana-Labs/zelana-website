@@ -686,7 +686,7 @@ export default function ProofsPage() {
       <footer className="border-t border-white/5 mt-20">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
           <div className="text-xs text-white/30 text-center uppercase tracking-widest">
-            Privacy-focused zkSVM on Solana
+            Privacy-focused ZK ROLLUP on Solana
           </div>
         </div>
       </footer>

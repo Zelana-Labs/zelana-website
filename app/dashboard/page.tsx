@@ -47,7 +47,7 @@ export default function DashboardPage() {
               Sign In
             </button>
             <p className="text-center text-xs text-gray-400 font-light">
-              Privacy-focused zkSVM on Solana
+              Privacy-focused ZK ROLLUP on Solana
             </p>
           </div>
         </div>
@@ -271,7 +271,7 @@ export default function DashboardPage() {
       <footer className="border-t border-white/5 mt-20">
         <div className="max-w-6xl mx-auto px-6 lg:px-8 py-8">
           <div className="text-xs text-white/30 text-center uppercase tracking-widest">
-            Privacy-focused zkSVM on Solana
+            Privacy-focused ZK ROLLUP on Solana
           </div>
         </div>
       </footer>
