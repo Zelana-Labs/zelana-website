@@ -69,7 +69,7 @@ function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/40 bg-white/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-white/5 bg-white/80 backdrop-blur-xl">
       <nav className="max-w-7xl mx-auto flex h-18 items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-80">
           <Image 
@@ -80,14 +80,14 @@ function Navbar() {
           />
         </Link>
 
-        {/* Desktop Navigation */}
+        {/* Desktop Navigation
         <div className="hidden md:flex items-center gap-1">
           {NAV_LINKS.map((link) => (
             <NavLink key={link.href} href={link.href} isActive={isActiveRoute(link.href)}>
               {link.label}
             </NavLink>
           ))}
-        </div>
+        </div> */}
 
         <div className="hidden md:flex items-center gap-2">
           <Link 
