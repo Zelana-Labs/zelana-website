@@ -69,7 +69,7 @@ function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/5 bg-white/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-white/40 bg-white/80 backdrop-blur-xl">
       <nav className="max-w-7xl mx-auto flex h-18 items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-80">
           <Image 
@@ -118,7 +118,7 @@ function Navbar() {
       {open && (
         <div className="md:hidden border-t border-zinc-200 bg-white/95 backdrop-blur-xl">
           <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-4">
-            {NAV_LINKS.map((link) => (
+            {/* {NAV_LINKS.map((link) => (
               <button 
                 key={link.href} 
                 onClick={() => handleMobileLinkClick(link.href)}
@@ -130,7 +130,7 @@ function Navbar() {
               >
                 {link.label}
               </button>
-            ))}
+            ))} */}
             <hr className="my-2 border-zinc-200" />
             <Link 
               href="https://form.typeform.com/to/akKCUvuh" 

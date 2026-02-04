@@ -59,7 +59,7 @@ export default function RootLayout({
     "url": "https://zelana.org",
   };
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="light">
       <head>
         <script
           type="application/ld+json"
