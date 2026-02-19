@@ -21,7 +21,7 @@ export default function HeroPanel() {
         </div>
         <div>
           <p className="font-semibold text-zinc-900">Encrypted bridge</p>
-          <p>Bridging funds between the L1 and L2 by using committments</p>
+          <p>Bridging funds between the L1 and L2 by using commitments</p>
         </div>
       </div>
       <div className="flex flex-wrap gap-2 text-[10px] uppercase tracking-[0.3em] text-zinc-500">
