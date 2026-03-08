@@ -401,7 +401,7 @@ export function L2BridgeEnhanced() {
             const base64Tx = getBase64EncodedWireTransaction(compiledTransaction);
             const transactionBuffer = Buffer.from(base64Tx, "base64");
 
-            const chainId = selectedPreset === 'localhost' ? 'solana:localnet' : 'solana:devnet';
+            const chainId = selectedPreset === 'localhost' ? 'solana:devnet' : 'solana:mainnet';
             const receipt = await signAndSendTransaction({
                 wallet,
                 transaction: transactionBuffer,

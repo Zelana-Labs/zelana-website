@@ -13,14 +13,11 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         // Solana RPC configuration (top-level, not inside embeddedWallets)
         solana: {
           rpcs: {
-            'solana:localnet': {
+            'solana:devnet': {
               rpc: createSolanaRpc('http://127.0.0.1:8899'),
               rpcSubscriptions: createSolanaRpcSubscriptions('ws://127.0.0.1:8900')
             },
-            'solana:devnet': {
-              rpc: createSolanaRpc('https://api.devnet.solana.com'),
-              rpcSubscriptions: createSolanaRpcSubscriptions('wss://api.devnet.solana.com')
-            }, 'solana:mainnet': {
+            'solana:mainnet': {
               rpc: createSolanaRpc('https://api.devnet.solana.com'),
               rpcSubscriptions: createSolanaRpcSubscriptions('wss://api.devnet.solana.com')
             }
