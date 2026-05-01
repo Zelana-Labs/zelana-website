@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
+  turbopack: {},
+  compiler: {
+    styledComponents: true,
+  },
+  transpilePackages: ['styled-components'],
   webpack: (config, { isServer }) => {
     if (isServer) {
       config.externals = config.externals || [];
