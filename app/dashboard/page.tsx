@@ -9,6 +9,8 @@ import { ShieldedTransfer } from "@/components/dashboard/shielded-transfer";
 import { TransactionHistory } from "@/components/dashboard/transaction-history";
 import { useL2Wallet } from "@/contexts/L2WalletContext";
 import { isDemoMode } from "@/lib/demo-mode";
+import { fetchAllowlist, isWalletAllowed } from "@/lib/allowlist";
+import LoginScreen from "@/components/dashboard/login-screen";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -18,6 +20,8 @@ export default function DashboardPage() {
 
   const { user, logout, authenticated, login } = usePrivy();
   const { isReady, l2Address, error: l2Error } = useL2Wallet();
+  const [isAllowed, setIsAllowed] = useState<boolean | null>(null);
+  const [copied, setCopied] = useState(false);
 
   // Redirect to demo page in production
   useEffect(() => {
@@ -26,6 +30,15 @@ export default function DashboardPage() {
       router.push('/demo');
     }
   }, [router]);
+
+  // Check allowlist after authentication
+  useEffect(() => {
+    if (!authenticated || !user?.wallet?.address) return;
+
+    fetchAllowlist().then((allowlist) => {
+      setIsAllowed(isWalletAllowed(user.wallet!.address!, allowlist));
+    });
+  }, [authenticated, user?.wallet?.address]);
 
   // Show loading state while redirecting
   if (isRedirecting) {
@@ -39,46 +52,127 @@ export default function DashboardPage() {
   // Login screen
   if (!authenticated) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center px-4">
+      <LoginScreen/>
+    )
+  }
+
+  // Access denied screen
+  if (authenticated && isAllowed === false) {
+    const walletAddress = user?.wallet?.address || '';
+
+    const copyAddress = () => {
+      if (walletAddress) {
+        navigator.clipboard.writeText(walletAddress);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }
+    };
+
+    return (
+      <>
         <style jsx>{`
           @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; }
+            to { opacity: 1; }
           }
-          .fade-in {
-            animation: fadeIn 0.6s ease-out forwards;
+          .animate-fadeIn {
+            animation: fadeIn 1.5s ease forwards;
           }
-          .delay-1 { animation-delay: 0.1s; opacity: 0; }
         `}</style>
-
-        <div className="w-full max-w-sm space-y-8">
-          {/* Logo */}
-          <div className="text-center fade-in">
-            <h1 className="text-xl font-light text-black tracking-tight">
-              Zelana Dashboard
-            </h1>
+        <div className="min-h-screen bg-zinc-50 flex items-center justify-center px-4 animate-fadeIn">
+        <div className="text-center max-w-sm w-full">
+          {/* Icon */}
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-red-50 mb-5">
+            <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728A9 9 0 015.636 5.636" />
+            </svg>
           </div>
 
-          {/* Sign In Button */}
-          <div className="space-y-4 fade-in delay-1">
-            <button
-              onClick={login}
-              className="w-full bg-black hover:bg-gray-900 text-white py-3.5 rounded-2xl text-sm font-medium tracking-wide transition-all"
-            >
-              Sign In
-            </button>
-            <p className="text-center text-xs text-gray-400 font-light">
-              Privacy-focused ZK ROLLUP on Solana
-            </p>
+          {/* Text */}
+          <h1 className="text-xl font-medium text-zinc-900 mb-1.5">
+            Access Denied
+          </h1>
+          <p className="text-sm text-zinc-400 mb-6">
+            Your wallet is not in the allowlist.
+          </p>
+
+          {/* Wallet Address */}
+          <div className="bg-white border border-zinc-200 rounded-2xl p-1 pl-5 mb-5 ">
+            <div className="flex items-center justify-between gap-2">
+              <code className="text-xs font-mono text-zinc-500 break-all text-left">
+                {walletAddress}
+              </code>
+              <button
+                onClick={copyAddress}
+                className={`flex-shrink-0 relative w-7 h-7 flex items-center justify-center rounded-full transition-all duration-200 text-zinc-400 hover:text-zinc-600 ${
+                  copied
+                    ? 'bg-zinc-100 shadow-[inset_0_1px_3px_rgba(0,0,0,0.08)]'
+                    : 'hover:bg-zinc-50 shadow-none'
+                }`}
+                title="Copy address"
+              >
+                <svg
+                  key="copy"
+                  className={`w-4 h-4 absolute transition-all duration-200 ${copied ? 'opacity-0 scale-75' : 'opacity-100 scale-100'}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                <svg
+                  key="check"
+                  className={`w-4 h-4 absolute transition-all duration-200 ${copied ? 'opacity-100 scale-100 text-zinc-500' : 'opacity-0 scale-75'}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </button>
+            </div>
           </div>
+
+          {/* Logout button */}
+          <button
+            onClick={logout}
+            className="w-full bg-zinc-900 hover:bg-zinc-800 text-white py-2.5 rounded-lg text-sm font-medium transition-colors"
+          >
+            Sign out
+          </button>
+        </div>
+      </div>
+      </>
+    );
+  }
+
+  // Loading check
+  if (authenticated && isAllowed === null) {
+    return (
+      <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-zinc-100 mb-4">
+            <svg className="w-6 h-6 text-zinc-400 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+          </div>
+          <p className="text-sm text-zinc-500">Verifying access...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div className="min-h-screen bg-[#0a0a0a] animate-fadeIn">
       <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 1.5s ease forwards;
+        }
         @keyframes slideInFromTop {
           from { opacity: 0; transform: translateY(-20px); }
           to { opacity: 1; transform: translateY(0); }
@@ -185,8 +279,8 @@ export default function DashboardPage() {
         {/* Tab Navigation */}
         <div className="slide-in-bottom delay-100 mb-6">
           <div className="flex gap-1 p-1 bg-zinc-900/50 rounded-xl border border-white/5 w-fit">
-            <TabButton 
-              active={activeTab === 'bridge'} 
+            <TabButton
+              active={activeTab === 'bridge'}
               onClick={() => setActiveTab('bridge')}
               icon={
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -196,8 +290,8 @@ export default function DashboardPage() {
             >
               Bridge
             </TabButton>
-            <TabButton 
-              active={activeTab === 'transfer'} 
+            <TabButton
+              active={activeTab === 'transfer'}
               onClick={() => setActiveTab('transfer')}
               icon={
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -207,8 +301,8 @@ export default function DashboardPage() {
             >
               Transfer
             </TabButton>
-            <TabButton 
-              active={activeTab === 'shielded'} 
+            <TabButton
+              active={activeTab === 'shielded'}
               onClick={() => setActiveTab('shielded')}
               icon={
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -218,8 +312,8 @@ export default function DashboardPage() {
             >
               Shielded
             </TabButton>
-            <TabButton 
-              active={activeTab === 'history'} 
+            <TabButton
+              active={activeTab === 'history'}
               onClick={() => setActiveTab('history')}
               icon={
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -301,25 +395,24 @@ export default function DashboardPage() {
 }
 
 // Tab Button Component
-function TabButton({ 
-  active, 
-  onClick, 
-  children, 
-  icon 
-}: { 
-  active: boolean; 
-  onClick: () => void; 
+function TabButton({
+  active,
+  onClick,
+  children,
+  icon
+}: {
+  active: boolean;
+  onClick: () => void;
   children: React.ReactNode;
   icon?: React.ReactNode;
 }) {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
-        active
+      className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${active
           ? 'bg-white/10 text-white border border-white/10'
           : 'text-white/60 hover:text-white hover:bg-white/5'
-      }`}
+        }`}
     >
       {icon}
       <span className="hidden sm:inline">{children}</span>
