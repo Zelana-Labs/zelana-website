@@ -5,7 +5,7 @@ import { ArrowRight, Mail } from "lucide-react";
 
 export default function CTASection() {
   return (
-    <section className="max-w-6xl mx-auto px-6">
+    <section className="max-w-[90rem] mx-auto px-6">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}

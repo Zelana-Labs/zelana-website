@@ -10,7 +10,7 @@ const supporters = [
 
 export default function SupportedBy() {
   return (
-    <section className="max-w-6xl mx-auto px-6">
+    <section className="max-w-[90rem] mx-auto px-6">
       <motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}

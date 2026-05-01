@@ -12,7 +12,7 @@ export default function HeroPanel() {
     >
       <div>
         <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Focus areas</p>
-        <h3 className="mt-2 text-xl font-semibold text-zinc-900">What we’re prototyping</h3>
+        <h3 className="mt-2 text-xl font-semibold text-zinc-900">What we're prototyping</h3>
       </div>
       <div className="space-y-4 text-sm text-zinc-600">
         <div>
