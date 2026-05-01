@@ -2,7 +2,6 @@
 
 import Hero from "@/components/landing/Hero";
 import Solutions from "@/components/landing/Solutions";
-import Principles from "@/components/landing/Principles";
 import SupportedBy from "@/components/landing/SupportedBy";
 import CTASection from "@/components/landing/CTASection";
 import Footer from "@/components/landing/Footer";
@@ -17,7 +16,6 @@ export default function LandingPage() {
         <Hero />
         <SupportedBy />
         <Solutions />
-        <Principles />
         <CTASection />
       </main>
       <Footer />
